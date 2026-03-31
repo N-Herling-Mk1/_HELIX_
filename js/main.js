@@ -27,11 +27,11 @@
   /* ── SECTOR IMAGE SWAP ── */
   function swapSectorImage(sector) {
     const imgMap = {
-      H: "assets/img/_1.png",
-      E: "assets/img/_2.png",
-      L: "assets/img/_3.png",
-      I: "assets/img/_4.png",
-      X: "assets/img/_5.png"
+      H: "./assets/img/_1.png",
+      E: "./assets/img/_2.png",
+      L: "./assets/img/_3.png",
+      I: "./assets/img/_4.png",
+      X: "./assets/img/_5.png"
     };
     const src = imgMap[sector.letter];
     if (!src) return;
