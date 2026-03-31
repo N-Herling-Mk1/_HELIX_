@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H.E.L.I.X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Press+Start+2P&family=Exo+2:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan:      #00e5ff;
+  --cyan-mid:  #00b3cc;
+  --cyan-dim:  #007a8c;
+  --orange:    #ff6a00;
+  --bg:        #020c14;
+  --text:      #89ccd9;
+  --text-dim:  #3a6a78;
+  --green:     #00ff41;
+  --green-dim: #009929;
+  --glow-c:    rgba(0,229,255,0.55);
+  --glow-o:    rgba(255,106,0,0.5);
+  --glow-g:    rgba(0,255,65,0.65);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; font-family:'Exo 2',sans-serif; color:var(--text); }
+
+/* ── BACKGROUND ── */
+.grid-bg {
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+.grid-bg::before {
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(135deg, rgba(0,229,255,0.025) 25%, transparent 25%),
+    linear-gradient(45deg,  rgba(0,229,255,0.025) 25%, transparent 25%);
+  background-size:96px 96px;
+}
+.scanlines {
+  position:fixed; inset:0; z-index:5; pointer-events:none;
+  background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.09) 3px, rgba(0,0,0,0.09) 4px);
+}
+.vignette {
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 25%, rgba(2,12,20,0.7) 75%, rgba(2,12,20,0.97) 100%);
+}
+
+/* ── CANVAS ── */
+#bg-canvas, #helix-canvas { position:fixed; top:0; left:0; pointer-events:none; }
+#bg-canvas    { z-index:1; }
+#helix-canvas { z-index:2; }
+
+/* ── CORNERS + HLINES ── */
+.corner { position:fixed; width:56px; height:56px; z-index:20; }
+.corner::before, .corner::after { content:''; position:absolute; background:var(--cyan); box-shadow:0 0 8px var(--glow-c); }
+.corner::before { width:2px; height:100%; top:0; left:0; }
+.corner::after  { width:100%; height:2px; top:0; left:0; }
+.corner.tl { top:22px; left:22px; }
+.corner.tr { top:22px; right:22px; transform:scaleX(-1); }
+.corner.bl { bottom:22px; left:22px; transform:scaleY(-1); }
+.corner.br { bottom:22px; right:22px; transform:scale(-1,-1); }
+.hline { position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none; background:linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.12) 15%, rgba(0,229,255,0.12) 85%, transparent 100%); }
+.hline.top { top:72px; } .hline.bottom { bottom:72px; }
+
+/* ── TITLE — fixed vertically centered ── */
+.title-center {
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%, -50%);
+  z-index:10;
+  display:flex; flex-direction:column; align-items:center;
+  pointer-events:none;
+}
+.title-wrap {
+  display:flex; align-items:baseline;
+  opacity:0; animation:rise 1s ease 0.9s forwards;
+}
+.title {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(5rem,14vw,12rem); font-weight:900;
+  letter-spacing:0.18em; color:#fff; line-height:1;
+  text-shadow:0 0 22px var(--glow-c), 0 0 60px rgba(0,229,255,0.3), 0 0 120px rgba(0,229,255,0.12);
+}
+.dot {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(2.2rem,5.5vw,5rem); font-weight:900;
+  color:var(--orange); text-shadow:0 0 16px var(--glow-o);
+  line-height:1; align-self:center; padding:0 0.04em;
+}
+.divider {
+  margin:1.2rem auto 0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--cyan) 40%, var(--orange) 60%, transparent);
+  box-shadow:0 0 10px var(--glow-c);
+  width:0; animation:expand 0.9s cubic-bezier(.22,1,.36,1) 1.4s forwards;
+}
+
+/* ── BASH TERMINAL (top, right-of-center left side) ── */
+.terminal {
+  position:fixed; top:88px;
+  right:calc(50% + 2.5vw);
+  width:clamp(280px,38vw,460px);
+  border:1px solid var(--cyan-dim);
+  background:rgba(2,10,16,0.93);
+  box-shadow:0 0 0 1px rgba(0,229,255,0.05), inset 0 0 24px rgba(0,229,255,0.03), 0 8px 32px rgba(0,0,0,0.55);
+  z-index:10;
+  opacity:0; animation:rise 0.8s ease 0.3s forwards;
+}
+.term-bar {
+  display:flex; align-items:center; gap:6px;
+  padding:8px 14px; background:rgba(0,229,255,0.05);
+  border-bottom:1px solid var(--cyan-dim);
+}
+.term-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.term-dot.r { background:#ff5f56; } .term-dot.y { background:#ffbd2e; } .term-dot.g { background:#27c93f; }
+.term-title { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase; margin-left:4px; }
+.term-body {
+  padding:12px 16px 14px;
+  height:172px;
+  overflow:hidden;
+  display:flex; flex-direction:column; gap:4px;
+}
+.term-line {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.58rem,1vw,0.72rem);
+  letter-spacing:0.07em; line-height:1.55;
+  white-space:nowrap; overflow:hidden;
+  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  max-width:0; flex-shrink:0;
+}
+.term-line.prompt { color:var(--cyan-mid); text-shadow:0 0 5px var(--glow-c); }
+.term-cursor {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.58rem,1vw,0.72rem);
+  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  animation:blink 1s step-end infinite;
+}
+.term-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
+
+/* ── ACRONYM PANEL (top, left-of-center right side) — CRT style ── */
+.acro-panel {
+  position:fixed; top:88px;
+  left:calc(50% + 2.5vw);
+  width:clamp(280px,38vw,460px);
+  border:1px solid rgba(0,255,65,0.22);
+  background:rgba(0,9,3,0.95);
+  box-shadow:
+    0 0 0 1px rgba(0,255,65,0.04),
+    inset 0 0 28px rgba(0,255,65,0.05),
+    0 0 18px rgba(0,255,65,0.08),
+    0 8px 32px rgba(0,0,0,0.65);
+  z-index:10;
+  overflow:hidden;
+  opacity:0;
+}
+.acro-panel.show { animation:rise 0.7s ease forwards; }
+/* CRT phosphor scanlines */
+.acro-panel::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.028) 2px, rgba(0,255,65,0.028) 3px);
+}
+/* subtle corner vignette inside panel */
+.acro-panel::before {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:4;
+  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,9,3,0.55) 100%);
+}
+.acro-bar {
+  display:flex; align-items:center; gap:6px;
+  padding:8px 14px; background:rgba(0,255,65,0.04);
+  border-bottom:1px solid rgba(0,255,65,0.16);
+}
+.acro-bar-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.acro-bar-dot.r { background:#3a1212; } .acro-bar-dot.y { background:#3a3012; } .acro-bar-dot.g { background:#123a12; }
+.acro-bar-title { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:0.2em; color:var(--green-dim); text-transform:uppercase; margin-left:4px; }
+.acro-body {
+  padding:12px 16px 14px;
+  height:172px;
+  overflow:hidden;
+  display:flex; flex-direction:column; gap:4px;
+  position:relative; z-index:2;
+}
+.acro-line {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.58rem,1vw,0.72rem);
+  letter-spacing:0.08em; line-height:1.55;
+  white-space:nowrap; overflow:hidden;
+  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  max-width:0; flex-shrink:0;
+}
+.acro-line.dim { color:var(--green-dim); text-shadow:none; }
+.acro-hl { color:var(--cyan); text-shadow:0 0 8px var(--glow-c); }
+.acro-cursor {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.58rem,1vw,0.72rem);
+  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  animation:blink 1s step-end infinite;
+}
+.acro-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
+
+/* ── ENTER BUTTON — fixed bottom center ── */
+.init-btn {
+  position:fixed; bottom:130px;
+  left:0; right:0; margin:0 auto;
+  width:fit-content;
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.05rem,2.1vw,1.4rem); font-weight:700;
+  letter-spacing:0.52em; color:var(--bg);
+  background:var(--cyan); border:none;
+  padding:22px 90px; cursor:pointer;
+  clip-path:polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  overflow:hidden;
+  z-index:20;
+  opacity:0;
+  animation:rise 1s ease 3.8s forwards, pulse-btn 2.2s ease-in-out 5s infinite;
+  transition:background 0.15s, color 0.15s;
+  white-space:nowrap;
+}
+.init-btn::before {
+  content:''; position:absolute;
+  top:0; left:-60%; width:55%; height:100%;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
+  animation:sheen 2.4s linear 5.2s infinite;
+}
+.init-btn:hover { background:#fff; color:var(--bg); }
+@keyframes sheen { 0%{left:-60%} 100%{left:115%} }
+
+/* ── TRANSITION OVERLAY ── */
+#transition { position:fixed; inset:0; z-index:100; pointer-events:none; }
+#scan-wipe {
+  position:absolute; left:0; right:0; height:110%; top:-110%;
+  background:repeating-linear-gradient(0deg, rgba(0,229,255,0.2) 0px, rgba(0,229,255,0.2) 2px, transparent 2px, transparent 6px);
+  box-shadow:0 0 60px rgba(0,229,255,0.6), 0 0 120px rgba(0,229,255,0.3);
+}
+#bloom {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, rgba(0,229,255,0.92) 0%, rgba(0,229,255,0) 70%);
+  opacity:0;
+}
+#blackout { position:absolute; inset:0; background:var(--bg); opacity:0; }
+.sweep   { animation:scan-sweep 0.7s ease-in forwards; }
+.flash   { animation:bloom-flash 1.0s ease forwards 0.45s; }
+.fadeout { animation:fade-black 0.5s ease forwards 1.3s; }
+
+/* ── KEYFRAMES ── */
+@keyframes rise       { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes expand     { from{width:0} to{width:min(480px,55vw)} }
+@keyframes blink      { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse-btn  {
+  0%,100%{ box-shadow:0 0 14px var(--glow-c), 0 0 0 0 rgba(0,229,255,0); }
+  50%    { box-shadow:0 0 30px var(--glow-c), 0 0 0 9px rgba(0,229,255,0.07); }
+}
+@keyframes scan-sweep { from{top:-110%} to{top:110%} }
+@keyframes bloom-flash { 0%{opacity:0;transform:scale(0.5)} 35%{opacity:1;transform:scale(1.05)} 100%{opacity:0;transform:scale(1.4)} }
+@keyframes fade-black  { from{opacity:0} to{opacity:1} }
+@keyframes type-out    { from{max-width:0} to{max-width:100%} }
+</style>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="helix-canvas"></canvas>
+
+<div class="hline top"></div>
+<div class="hline bottom"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div id="transition">
+  <div id="scan-wipe"></div>
+  <div id="bloom"></div>
+  <div id="blackout"></div>
+</div>
+
+<!-- TITLE — vertically centered on helix -->
+<div class="title-center">
+  <div class="title-wrap">
+    <span class="title">H</span><span class="dot">·</span>
+    <span class="title">E</span><span class="dot">·</span>
+    <span class="title">L</span><span class="dot">·</span>
+    <span class="title">I</span><span class="dot">·</span>
+    <span class="title">X</span>
+  </div>
+  <div class="divider"></div>
+</div>
+
+<!-- BASH TERMINAL — top, left of center -->
+<div class="terminal">
+  <div class="term-bar">
+    <div class="term-dot r"></div>
+    <div class="term-dot y"></div>
+    <div class="term-dot g"></div>
+    <span class="term-title">helix-core &nbsp;—&nbsp; bash</span>
+  </div>
+  <div class="term-body" id="term-body"></div>
+</div>
+
+<!-- ACRONYM PANEL — top, right of center, CRT -->
+<div class="acro-panel" id="acro-panel">
+  <div class="acro-bar">
+    <div class="acro-bar-dot r"></div>
+    <div class="acro-bar-dot y"></div>
+    <div class="acro-bar-dot g"></div>
+    <span class="acro-bar-title">helix &nbsp;—&nbsp; designation</span>
+  </div>
+  <div class="acro-body" id="acro-body"></div>
+</div>
+
+<!-- ENTER BUTTON — bottom center -->
+<button class="init-btn" id="init-btn">ENTER</button>
+
+<script>
+/* ══════════════════════════════════════════
+   PARTICLE FIELD
+══════════════════════════════════════════ */
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx    = bgCanvas.getContext('2d');
+const hCanvas  = document.getElementById('helix-canvas');
+const hCtx     = hCanvas.getContext('2d');
+let W = 0, H = 0;
+
+function resize() {
+  W = bgCanvas.width = hCanvas.width  = window.innerWidth;
+  H = bgCanvas.height = hCanvas.height = window.innerHeight;
+}
+
+const PARTICLE_COUNT = 200;
+const particles = [];
+function mkParticle(full) {
+  return { x:Math.random()*(W||1400), y:full?Math.random()*(H||900):-8, vx:(Math.random()-0.5)*0.24, vy:0.07+Math.random()*0.3, r:0.5+Math.random()*1.5, a:0.04+Math.random()*0.26, cyan:Math.random()>0.4 };
+}
+function initParticles() { particles.length=0; for(let i=0;i<PARTICLE_COUNT;i++) particles.push(mkParticle(true)); }
+function drawParticles() {
+  bgCtx.clearRect(0,0,W,H);
+  for(const p of particles) {
+    bgCtx.save(); bgCtx.globalAlpha=p.a; bgCtx.fillStyle=p.cyan?'#00e5ff':'#ff6a00';
+    bgCtx.shadowBlur=5; bgCtx.shadowColor=p.cyan?'rgba(0,229,255,0.7)':'rgba(255,106,0,0.7)';
+    bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill(); bgCtx.restore();
+    p.x+=p.vx; p.y+=p.vy; p.vx+=(Math.random()-0.5)*0.009; p.vx=Math.max(-0.38,Math.min(0.38,p.vx));
+    if(p.y>H+10) Object.assign(p,mkParticle(false));
+  }
+}
+
+/* ══════════════════════════════════════════
+   HELIX RENDERER
+══════════════════════════════════════════ */
+const PAIRS = ['A—T','T—A','G—C','C—G'];
+let phase = 0;
+function drawHelix() {
+  hCtx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, radius=Math.min(W,H)*0.082, hHeight=H*0.44;
+  const RUNGS=24, TURNS=3.2, spacing=hHeight/RUNGS;
+  const s1=[],s2=[];
+  for(let i=0;i<=RUNGS;i++){
+    const y=cy-hHeight/2+i*spacing, a=phase+(i/RUNGS)*TURNS*Math.PI*2;
+    s1.push({x:cx+radius*Math.cos(a),           y, d:(Math.sin(a)+1)/2});
+    s2.push({x:cx+radius*Math.cos(a+Math.PI),   y, d:(Math.sin(a+Math.PI)+1)/2});
+  }
+  const rungs=[];
+  for(let i=0;i<RUNGS;i++) rungs.push({x1:s1[i].x,y1:s1[i].y,x2:s2[i].x,y2:s2[i].y,depth:(s1[i].d+s2[i].d)/2,d1:s1[i].d,d2:s2[i].d,idx:i});
+  rungs.sort((a,b)=>a.depth-b.depth);
+  for(const r of rungs){
+    const isCyan=r.idx%2===0, col=isCyan?'#00e5ff':'#ff6a00', glow=isCyan?'rgba(0,229,255,0.85)':'rgba(255,106,0,0.85)';
+    hCtx.save();
+    hCtx.globalAlpha=0.14+r.depth*0.72; hCtx.strokeStyle=col; hCtx.lineWidth=1.3+r.depth*1.0;
+    hCtx.shadowBlur=r.depth*14; hCtx.shadowColor=glow;
+    hCtx.beginPath(); hCtx.moveTo(r.x1,r.y1); hCtx.lineTo(r.x2,r.y2); hCtx.stroke();
+    [[r.x1,r.y1,r.d1,isCyan?'#00e5ff':'#ff6a00'],[r.x2,r.y2,r.d2,isCyan?'#ff6a00':'#00e5ff']].forEach(([x,y,d,c])=>{
+      hCtx.globalAlpha=0.18+d*0.78; hCtx.fillStyle=c; hCtx.shadowBlur=d*12; hCtx.shadowColor=c;
+      hCtx.beginPath(); hCtx.arc(x,y,1.7+d*2.3,0,Math.PI*2); hCtx.fill();
+    });
+    if(r.depth>0.52){
+      const fa=Math.pow((r.depth-0.52)/0.48,1.8)*0.72, fs=8.5+r.depth*3.5;
+      const mx=(r.x1+r.x2)/2, my=(r.y1+r.y2)/2;
+      hCtx.globalAlpha=fa; hCtx.font=`400 ${fs.toFixed(1)}px 'Share Tech Mono',monospace`;
+      hCtx.fillStyle=isCyan?'#00e5ff':'#ff9244'; hCtx.textAlign='center'; hCtx.textBaseline='middle';
+      hCtx.shadowBlur=8*r.depth; hCtx.shadowColor=isCyan?'rgba(0,229,255,0.95)':'rgba(255,106,0,0.95)';
+      hCtx.fillText(PAIRS[r.idx%PAIRS.length],mx,my);
+    }
+    hCtx.restore();
+  }
+  function strand(pts,col,sc){
+    for(let i=0;i<pts.length-1;i++){
+      const p=pts[i],q=pts[i+1];
+      hCtx.save(); hCtx.globalAlpha=0.3+p.d*0.7; hCtx.strokeStyle=col; hCtx.lineWidth=1.5+p.d*3.2;
+      hCtx.lineCap='round'; hCtx.shadowBlur=p.d*22; hCtx.shadowColor=sc;
+      hCtx.beginPath(); hCtx.moveTo(p.x,p.y); hCtx.lineTo(q.x,q.y); hCtx.stroke(); hCtx.restore();
+    }
+  }
+  strand(s1,'#00e5ff','rgba(0,229,255,0.9)');
+  strand(s2,'#ff6a00','rgba(255,106,0,0.9)');
+  for(const p of [...s1,...s2]){
+    if(p.d<0.76) continue;
+    hCtx.save(); hCtx.globalAlpha=(p.d-0.76)*3.8; hCtx.fillStyle='#fff';
+    hCtx.shadowBlur=14; hCtx.shadowColor='#00e5ff';
+    hCtx.beginPath(); hCtx.arc(p.x,p.y,2.2*p.d,0,Math.PI*2); hCtx.fill(); hCtx.restore();
+  }
+}
+
+/* ══════════════════════════════════════════
+   ANIMATION LOOP
+══════════════════════════════════════════ */
+let last=0;
+function loop(ts){
+  const dt=Math.min((ts-last)/16.67,2)||1; last=ts;
+  phase+=0.005*dt; drawParticles(); drawHelix(); requestAnimationFrame(loop);
+}
+window.addEventListener('resize',()=>{resize();initParticles();});
+resize(); initParticles(); requestAnimationFrame(loop);
+
+/* ══════════════════════════════════════════
+   RESET ON LOAD — clear any bfcache state
+══════════════════════════════════════════ */
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return; // fresh load, nothing to reset
+  // clear terminals
+  document.getElementById('term-body').innerHTML = '';
+  document.getElementById('acro-body').innerHTML = '';
+  // hide acro panel
+  const panel = document.getElementById('acro-panel');
+  panel.classList.remove('show');
+  panel.style.opacity = '0';
+  // reset button
+  const btn = document.getElementById('init-btn');
+  btn.style.pointerEvents = '';
+  btn.style.opacity = '';
+  // re-run sequences
+  runTerminal();
+  runAcronym();
+});
+
+
+function stripTags(html){ return html.replace(/<[^>]*>/g,''); }
+
+function typeLines(container, lines, baseDelay, cursorClass) {
+  let cursorEl = null;
+  lines.forEach(({ html, text, cls, delay, dur }) => {
+    const content  = html || text || '';
+    const isHtml   = !!html;
+    const visible  = stripTags(content);
+    const steps    = Math.max(10, Math.round(visible.length * 1.1));
+    setTimeout(() => {
+      if (cursorEl) cursorEl.remove();
+      const el = document.createElement('div');
+      el.className = 'term-line' + (cls ? ' ' + cls : '');
+      if (isHtml) el.innerHTML = content;
+      else        el.textContent = content;
+      el.style.setProperty('--dur',   dur + 'ms');
+      el.style.setProperty('--steps', steps);
+      el.classList.add('expand');
+      container.appendChild(el);
+      // blinking cursor at end of this line
+      cursorEl = document.createElement('span');
+      cursorEl.className   = cursorClass;
+      cursorEl.textContent = '█';
+      el.appendChild(cursorEl);
+      container.scrollTop = container.scrollHeight;
+    }, baseDelay + delay);
+  });
+}
+
+/* ── BASH TERMINAL ── */
+function runTerminal() {
+  const TERM_APPEAR = 300;
+  typeLines(
+    document.getElementById('term-body'),
+    [
+      { text: '$ boot --system helix --mode ssl',        cls: 'prompt', delay: 200,  dur: 460 },
+      { text: 'SYS ONLINE ....................... [OK]',  cls: '',       delay: 900,  dur: 390 },
+      { text: 'LOADING BAYESIAN CORE ........... [OK]',  cls: '',       delay: 1400, dur: 400 },
+      { text: 'FRAMEWORK INITIALIZING .......... [OK]',  cls: '',       delay: 1920, dur: 410 },
+      { text: 'SSL PIPELINE READY .............. [OK]',  cls: '',       delay: 2450, dur: 390 },
+      { text: '$ ',                                      cls: 'prompt', delay: 3000, dur: 40  },
+    ],
+    TERM_APPEAR,
+    'term-cursor'
+  );
+}
+
+/* ── ACRONYM PANEL ── */
+function runAcronym() {
+  const TERM_APPEAR  = 300;
+  const ACRO_APPEAR  = TERM_APPEAR + 3000 + 40 + 700;
+  setTimeout(() => {
+    const panel = document.getElementById('acro-panel');
+    panel.style.opacity = '';
+    panel.classList.add('show');
+    typeLines(
+      document.getElementById('acro-body'),
+      [
+        { html: '&gt; DECODING DESIGNATION...',                            cls: 'acro-line dim', delay: 300,  dur: 320 },
+        { html: '<span class="acro-hl">H</span>  ──  HEP',                cls: 'acro-line',     delay: 760,  dur: 240 },
+        { html: '<span class="acro-hl">E</span>  ──  EPISTEMIC',          cls: 'acro-line',     delay: 1140, dur: 260 },
+        { html: '<span class="acro-hl">L</span>  ──  LEARNING',           cls: 'acro-line',     delay: 1500, dur: 240 },
+        { html: '<span class="acro-hl">I</span>  ──  INTELLIGENT AI',     cls: 'acro-line',     delay: 1860, dur: 280 },
+        { html: '<span class="acro-hl">X</span>  ──  EXPLORATION',        cls: 'acro-line',     delay: 2220, dur: 250 },
+        { html: '&gt; CONFIRMED',                                          cls: 'acro-line dim', delay: 2740, dur: 160 },
+      ],
+      0,
+      'acro-cursor'
+    );
+  }, ACRO_APPEAR);
+}
+
+runTerminal();
+runAcronym();
+
+/* ══════════════════════════════════════════
+   ENTER → ./init SEQUENCE → TRANSITION
+══════════════════════════════════════════ */
+document.getElementById('init-btn').addEventListener('click', () => {
+  // disable button immediately
+  const btn = document.getElementById('init-btn');
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '0.4';
+
+  const body = document.getElementById('term-body');
+
+  // remove any lingering cursor
+  const old = body.querySelector('.term-cursor');
+  if (old) old.remove();
+
+  const initLines = [
+    { text: '$ ./init --launch helix', cls: 'prompt', delay: 0,    dur: 380 },
+    { text: 'LOADING MODULES ......... [OK]',          delay: 520,  dur: 320 },
+    { text: 'ESTABLISHING LINK ....... [OK]',          delay: 980,  dur: 320 },
+    { text: 'HANDSHAKE COMPLETE ...... [OK]',          delay: 1440, dur: 320 },
+    { text: 'LAUNCHING ...',            cls: 'prompt', delay: 1900, dur: 200 },
+  ];
+
+  let cursor = null;
+  initLines.forEach(({ text, cls, delay, dur }) => {
+    const steps = Math.max(10, Math.round(text.length * 1.1));
+    setTimeout(() => {
+      if (cursor) cursor.remove();
+      const el = document.createElement('div');
+      el.className = 'term-line' + (cls ? ' ' + cls : '');
+      el.textContent = text;
+      el.style.setProperty('--dur',   dur + 'ms');
+      el.style.setProperty('--steps', steps);
+      el.classList.add('expand');
+      body.appendChild(el);
+      cursor = document.createElement('span');
+      cursor.className   = 'term-cursor';
+      cursor.textContent = '█';
+      el.appendChild(cursor);
+      body.scrollTop = body.scrollHeight;
+    }, delay);
+  });
+
+  // fire transition after init sequence finishes
+  setTimeout(() => {
+    const sw = document.getElementById('scan-wipe');
+    const bl = document.getElementById('bloom');
+    const bk = document.getElementById('blackout');
+    sw.classList.add('sweep');
+    bl.classList.add('flash');
+    bk.classList.add('fadeout');
+    setTimeout(() => {
+      // ── NAVIGATE TO HUB ──
+      window.location.href = 'main.html';
+      // ──────────────────────────────────────
+
+      // reset transition overlay
+      [sw, bl, bk].forEach(el => el.className = '');
+
+      // reset terminals
+      document.getElementById('term-body').innerHTML = '';
+      document.getElementById('acro-body').innerHTML = '';
+
+      // reset acronym panel
+      const panel = document.getElementById('acro-panel');
+      panel.classList.remove('show');
+      panel.style.opacity = '0';
+
+      // reset button
+      btn.style.pointerEvents = '';
+      btn.style.opacity = '';
+
+      // re-run boot sequences
+      runTerminal();
+      runAcronym();
+
+    }, 1950);
+  }, 2300);
+});
+</script>
+</body>
+</html>

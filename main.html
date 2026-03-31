@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H.E.L.I.X — Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@200;300;400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/helix.css">
+<link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+
+<canvas id="bg-canvas" style="position:fixed;top:0;left:0;z-index:1;pointer-events:none;"></canvas>
+<div class="grid-bg"></div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <a href="index.html" class="topbar-logo">
+    H<span class="dot">.</span>E<span class="dot">.</span>L<span class="dot">.</span>I<span class="dot">.</span>X
+  </a>
+  <div class="topbar-sep"></div>
+  <span class="topbar-label">NAVIGATION HUB</span>
+  <a href="index.html" class="topbar-back">← RETURN TO SPLASH</a>
+</header>
+
+<!-- HUB BODY -->
+<div class="hub-body">
+
+  <!-- LEFT NAV RAIL -->
+  <nav class="nav-rail">
+    <span class="rail-header">SECTOR</span>
+
+    <button class="sector-btn" data-sector="H">
+      <span class="btn-letter">H</span>
+      <div class="btn-meta">
+        <span class="btn-word">HEP</span>
+        <span class="btn-count">3 ARTICLES</span>
+      </div>
+    </button>
+
+    <button class="sector-btn" data-sector="E">
+      <span class="btn-letter">E</span>
+      <div class="btn-meta">
+        <span class="btn-word">EPISTEMIC</span>
+        <span class="btn-count">3 ARTICLES</span>
+      </div>
+    </button>
+
+    <button class="sector-btn" data-sector="L">
+      <span class="btn-letter">L</span>
+      <div class="btn-meta">
+        <span class="btn-word">LEARNING</span>
+        <span class="btn-count">3 ARTICLES</span>
+      </div>
+    </button>
+
+    <button class="sector-btn" data-sector="I">
+      <span class="btn-letter">I</span>
+      <div class="btn-meta">
+        <span class="btn-word">INTELLIGENT AI</span>
+        <span class="btn-count">2 ARTICLES</span>
+      </div>
+    </button>
+
+    <button class="sector-btn" data-sector="X">
+      <span class="btn-letter">X</span>
+      <div class="btn-meta">
+        <span class="btn-word">EXPLORATION</span>
+        <span class="btn-count">3 ARTICLES</span>
+      </div>
+    </button>
+
+    <div class="rail-footer">
+      <div class="rail-status">
+        <div class="status-dot"></div>
+        HELIX ONLINE
+      </div>
+    </div>
+  </nav>
+
+  <!-- CONTENT PANEL -->
+  <section class="content-panel">
+
+    <div class="panel-header" id="panel-header">
+      <div class="panel-sector-tag" id="panel-sector-tag">—</div>
+      <div class="panel-title-block">
+        <div class="panel-sector-name"  id="panel-sector-name">SELECT A SECTOR</div>
+        <div class="panel-article-count" id="panel-article-count">USE THE NAV RAIL ←</div>
+      </div>
+    </div>
+
+    <div class="panel-empty" id="panel-empty">
+      <div class="empty-glyph">H·E·L·I·X</div>
+      <div class="empty-label">SELECT A SECTOR TO ACCESS ARTICLES</div>
+    </div>
+
+    <div class="article-list" id="article-list" style="display:none;"></div>
+
+    <div class="viewer-panel" id="viewer-panel">
+      <div class="viewer-topbar">
+        <button class="viewer-back" id="viewer-back">← BACK TO LIST</button>
+        <span class="viewer-doc-title" id="viewer-doc-title"></span>
+        <a class="viewer-dl-btn" id="viewer-dl" href="#" download>↓ DOWNLOAD</a>
+      </div>
+      <iframe class="viewer-frame" id="viewer-frame" src="" title="Document Viewer"></iframe>
+    </div>
+
+  </section>
+
+</div>
+
+<script src="js/articles.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+# System
+.DS_Store
+Thumbs.db
+
+# Editors
+.vscode/settings.json
+*.swp
+*.swo
+
+# Keep doc folder structure but ignore actual PDFs from git tracking
+# (add PDFs manually or via Git LFS)
+# docs/**/*.pdf
+
+# Node (if build tools ever added)
+node_modules/
