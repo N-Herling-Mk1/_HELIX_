@@ -19,8 +19,34 @@
   const panelTag     = document.getElementById("panel-sector-tag");
   const panelName    = document.getElementById("panel-sector-name");
   const panelCount   = document.getElementById("panel-article-count");
+  const railImgBox   = document.getElementById("rail-img-box");
+  const railImg      = document.getElementById("rail-img");
 
   let activeSector = null;
+
+  /* ── SECTOR IMAGE SWAP ── */
+  function swapSectorImage(sector) {
+    const imgMap = {
+      H: "assets/img/_1.png",
+      E: "assets/img/_2.png",
+      L: "assets/img/_3.png",
+      I: "assets/img/_4.png",
+      X: "assets/img/_5.png"
+    };
+    const src = imgMap[sector.letter];
+    if (!src) return;
+
+    // fade out → swap src → fade in
+    railImg.classList.remove("loaded");
+    railImgBox.classList.remove("empty");
+
+    setTimeout(() => {
+      railImg.src = src;
+      railImg.onload = () => railImg.classList.add("loaded");
+      // fallback if already cached
+      if (railImg.complete) railImg.classList.add("loaded");
+    }, 200);
+  }
 
   /* ── SECTOR ACCENT VARS ── */
   function applySectorTheme(sector) {
@@ -92,6 +118,7 @@
 
     // apply theme
     applySectorTheme(sectorData);
+    swapSectorImage(sectorData);
 
     // update panel header
     panelTag.textContent   = sectorData.letter;
