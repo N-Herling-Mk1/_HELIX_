@@ -73,7 +73,8 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
 .corner.tr { top:22px; right:22px; transform:scaleX(-1); }
 .corner.bl { bottom:22px; left:22px; transform:scaleY(-1); }
 .corner.br { bottom:22px; right:22px; transform:scale(-1,-1); }
-.hline { position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none; background:linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.12) 15%, rgba(0,229,255,0.12) 85%, transparent 100%); }
+.hline { position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none;
+  background:linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.12) 15%, rgba(0,229,255,0.12) 85%, transparent 100%); }
 .hline.top { top:72px; } .hline.bottom { bottom:72px; }
 
 /* ── TITLE — fixed vertically centered ── */
@@ -107,109 +108,75 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
   width:0; animation:expand 0.9s cubic-bezier(.22,1,.36,1) 1.4s forwards;
 }
 
-/* ── BASH TERMINAL (top, right-of-center left side) ── */
-.terminal {
-  position:fixed; top:88px;
-  right:calc(50% + 2.5vw);
-  width:clamp(280px,38vw,460px);
-  border:1px solid var(--cyan-dim);
-  background:rgba(2,10,16,0.93);
-  box-shadow:0 0 0 1px rgba(0,229,255,0.05), inset 0 0 24px rgba(0,229,255,0.03), 0 8px 32px rgba(0,0,0,0.55);
+/* ── SINGLE CRT TERMINAL — centered, top ── */
+.crt-panel {
+  position:fixed;
+  top:88px;
+  left:0;
+  right:0;
+  margin:0 auto;
+  width:clamp(400px,58vw,700px);
+  border:1px solid var(--cyan);
+  background:rgba(0,0,0,0.96);
+  box-shadow:
+    0 0 0 1px rgba(0,229,255,0.15),
+    0 0 20px rgba(0,229,255,0.2),
+    0 8px 48px rgba(0,0,0,0.9);
   z-index:10;
-  opacity:0; animation:rise 0.8s ease 0.3s forwards;
+  overflow:hidden;
+  opacity:0; animation:rise 0.7s ease 0.3s forwards;
 }
-.term-bar {
+.crt-panel::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(0deg,
+    transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
+}
+.crt-panel::before { display:none; }
+.crt-bar {
   display:flex; align-items:center; gap:6px;
-  padding:8px 14px; background:rgba(0,229,255,0.05);
+  padding:9px 16px;
+  background:rgba(255,255,255,0.04);
   border-bottom:1px solid var(--cyan-dim);
 }
-.term-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-.term-dot.r { background:#ff5f56; } .term-dot.y { background:#ffbd2e; } .term-dot.g { background:#27c93f; }
-.term-title { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:0.2em; color:var(--text-dim); text-transform:uppercase; margin-left:4px; }
-.term-body {
-  padding:12px 16px 14px;
-  height:172px;
-  overflow:hidden;
-  display:flex; flex-direction:column; gap:4px;
-}
-.term-line {
+.crt-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.crt-dot.r { background:#ff5f56; }
+.crt-dot.y { background:#ffbd2e; }
+.crt-dot.g { background:#27c93f; }
+.crt-title {
   font-family:'Share Tech Mono',monospace;
-  font-size:clamp(0.58rem,1vw,0.72rem);
-  letter-spacing:0.07em; line-height:1.55;
-  white-space:nowrap; overflow:hidden;
-  color:var(--green); text-shadow:0 0 5px var(--glow-g);
-  max-width:0; flex-shrink:0;
+  font-size:0.62rem; letter-spacing:0.22em;
+  color:var(--cyan-dim); text-transform:uppercase; margin-left:4px;
 }
-.term-line.prompt { color:var(--cyan-mid); text-shadow:0 0 5px var(--glow-c); }
-.term-cursor {
-  font-family:'Share Tech Mono',monospace;
-  font-size:clamp(0.58rem,1vw,0.72rem);
-  color:var(--green); text-shadow:0 0 5px var(--glow-g);
-  animation:blink 1s step-end infinite;
-}
-.term-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
-
-/* ── ACRONYM PANEL (top, left-of-center right side) — CRT style ── */
-.acro-panel {
-  position:fixed; top:88px;
-  left:calc(50% + 2.5vw);
-  width:clamp(280px,38vw,460px);
-  border:1px solid rgba(0,255,65,0.22);
-  background:rgba(0,9,3,0.95);
-  box-shadow:
-    0 0 0 1px rgba(0,255,65,0.04),
-    inset 0 0 28px rgba(0,255,65,0.05),
-    0 0 18px rgba(0,255,65,0.08),
-    0 8px 32px rgba(0,0,0,0.65);
-  z-index:10;
+.crt-body {
+  padding:16px 20px 18px;
+  height:230px;
   overflow:hidden;
-  opacity:0;
-}
-.acro-panel.show { animation:rise 0.7s ease forwards; }
-/* CRT phosphor scanlines */
-.acro-panel::after {
-  content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
-  background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,65,0.028) 2px, rgba(0,255,65,0.028) 3px);
-}
-/* subtle corner vignette inside panel */
-.acro-panel::before {
-  content:''; position:absolute; inset:0; pointer-events:none; z-index:4;
-  background:radial-gradient(ellipse at center, transparent 55%, rgba(0,9,3,0.55) 100%);
-}
-.acro-bar {
-  display:flex; align-items:center; gap:6px;
-  padding:8px 14px; background:rgba(0,255,65,0.04);
-  border-bottom:1px solid rgba(0,255,65,0.16);
-}
-.acro-bar-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-.acro-bar-dot.r { background:#3a1212; } .acro-bar-dot.y { background:#3a3012; } .acro-bar-dot.g { background:#123a12; }
-.acro-bar-title { font-family:'Share Tech Mono',monospace; font-size:0.58rem; letter-spacing:0.2em; color:var(--green-dim); text-transform:uppercase; margin-left:4px; }
-.acro-body {
-  padding:12px 16px 14px;
-  height:172px;
-  overflow:hidden;
-  display:flex; flex-direction:column; gap:4px;
+  display:flex; flex-direction:column; gap:5px;
   position:relative; z-index:2;
 }
-.acro-line {
+.crt-line {
   font-family:'Share Tech Mono',monospace;
-  font-size:clamp(0.58rem,1vw,0.72rem);
-  letter-spacing:0.08em; line-height:1.55;
+  font-size:clamp(0.7rem,1.2vw,0.88rem);
+  letter-spacing:0.08em; line-height:1.6;
   white-space:nowrap; overflow:hidden;
-  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  color:#ffffff;
+  text-shadow:none;
   max-width:0; flex-shrink:0;
 }
-.acro-line.dim { color:var(--green-dim); text-shadow:none; }
-.acro-hl { color:var(--cyan); text-shadow:0 0 8px var(--glow-c); }
-.acro-cursor {
+.crt-line.dim    { color:rgba(255,255,255,0.45); }
+.crt-line.prompt { color:#ffffff; font-weight:bold; }
+.crt-hl          { color:#00e5ff; }
+.crt-cursor {
   font-family:'Share Tech Mono',monospace;
-  font-size:clamp(0.58rem,1vw,0.72rem);
-  color:var(--green); text-shadow:0 0 5px var(--glow-g);
+  font-size:clamp(0.7rem,1.2vw,0.88rem);
+  color:#ffffff;
   animation:blink 1s step-end infinite;
 }
-.acro-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
+.crt-line.ok { color:var(--green); text-shadow:0 0 6px var(--glow-g); }
+.crt-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
 
-/* ── ENTER BUTTON — fixed bottom center ── */
+/* ── ENTER BUTTON ── */
 .init-btn {
   position:fixed; bottom:130px;
   left:0; right:0; margin:0 auto;
@@ -223,7 +190,7 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
   overflow:hidden;
   z-index:20;
   opacity:0;
-  animation:rise 1s ease 3.8s forwards, pulse-btn 2.2s ease-in-out 5s infinite;
+  animation:rise 1s ease 3.2s forwards, pulse-btn 2.2s ease-in-out 4.4s infinite;
   transition:background 0.15s, color 0.15s;
   white-space:nowrap;
 }
@@ -231,7 +198,7 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
   content:''; position:absolute;
   top:0; left:-60%; width:55%; height:100%;
   background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
-  animation:sheen 2.4s linear 5.2s infinite;
+  animation:sheen 2.4s linear 4.6s infinite;
 }
 .init-btn:hover { background:#fff; color:var(--bg); }
 @keyframes sheen { 0%{left:-60%} 100%{left:115%} }
@@ -289,7 +256,7 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
   <div id="blackout"></div>
 </div>
 
-<!-- TITLE — vertically centered on helix -->
+<!-- TITLE -->
 <div class="title-center">
   <div class="title-wrap">
     <span class="title">H</span><span class="dot">·</span>
@@ -301,29 +268,18 @@ html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; fon
   <div class="divider"></div>
 </div>
 
-<!-- BASH TERMINAL — top, left of center -->
-<div class="terminal">
-  <div class="term-bar">
-    <div class="term-dot r"></div>
-    <div class="term-dot y"></div>
-    <div class="term-dot g"></div>
-    <span class="term-title">helix-core &nbsp;—&nbsp; bash</span>
+<!-- SINGLE CRT TERMINAL -->
+<div class="crt-panel" id="crt-panel">
+  <div class="crt-bar">
+    <div class="crt-dot r"></div>
+    <div class="crt-dot y"></div>
+    <div class="crt-dot g"></div>
+    <span class="crt-title" id="crt-title">helix &nbsp;—&nbsp; designation</span>
   </div>
-  <div class="term-body" id="term-body"></div>
+  <div class="crt-body" id="crt-body"></div>
 </div>
 
-<!-- ACRONYM PANEL — top, right of center, CRT -->
-<div class="acro-panel" id="acro-panel">
-  <div class="acro-bar">
-    <div class="acro-bar-dot r"></div>
-    <div class="acro-bar-dot y"></div>
-    <div class="acro-bar-dot g"></div>
-    <span class="acro-bar-title">helix &nbsp;—&nbsp; designation</span>
-  </div>
-  <div class="acro-body" id="acro-body"></div>
-</div>
-
-<!-- ENTER BUTTON — bottom center -->
+<!-- ENTER BUTTON -->
 <button class="init-btn" id="init-btn">ENTER</button>
 
 <script>
@@ -426,146 +382,78 @@ window.addEventListener('resize',()=>{resize();initParticles();});
 resize(); initParticles(); requestAnimationFrame(loop);
 
 /* ══════════════════════════════════════════
-   RESET ON LOAD — clear any bfcache state
+   TYPE UTILITY
 ══════════════════════════════════════════ */
-window.addEventListener('pageshow', (e) => {
-  if (!e.persisted) return; // fresh load, nothing to reset
-  // clear terminals
-  document.getElementById('term-body').innerHTML = '';
-  document.getElementById('acro-body').innerHTML = '';
-  // hide acro panel
-  const panel = document.getElementById('acro-panel');
-  panel.classList.remove('show');
-  panel.style.opacity = '0';
-  // reset button
-  const btn = document.getElementById('init-btn');
-  btn.style.pointerEvents = '';
-  btn.style.opacity = '';
-  // re-run sequences
-  runTerminal();
-  runAcronym();
-});
-
-
 function stripTags(html){ return html.replace(/<[^>]*>/g,''); }
 
-function typeLines(container, lines, baseDelay, cursorClass) {
+function typeLines(container, lines, cursorClass) {
   let cursorEl = null;
   lines.forEach(({ html, text, cls, delay, dur }) => {
-    const content  = html || text || '';
-    const isHtml   = !!html;
-    const visible  = stripTags(content);
-    const steps    = Math.max(10, Math.round(visible.length * 1.1));
+    const content = html || text || '';
+    const isHtml  = !!html;
+    const visible = stripTags(content);
+    const steps   = Math.max(10, Math.round(visible.length * 1.1));
     setTimeout(() => {
       if (cursorEl) cursorEl.remove();
       const el = document.createElement('div');
-      el.className = 'term-line' + (cls ? ' ' + cls : '');
+      el.className = 'crt-line' + (cls ? ' ' + cls : '');
       if (isHtml) el.innerHTML = content;
       else        el.textContent = content;
       el.style.setProperty('--dur',   dur + 'ms');
       el.style.setProperty('--steps', steps);
       el.classList.add('expand');
       container.appendChild(el);
-      // blinking cursor at end of this line
       cursorEl = document.createElement('span');
       cursorEl.className   = cursorClass;
       cursorEl.textContent = '█';
       el.appendChild(cursorEl);
       container.scrollTop = container.scrollHeight;
-    }, baseDelay + delay);
+    }, delay);
   });
 }
 
-/* ── BASH TERMINAL ── */
-function runTerminal() {
-  const TERM_APPEAR = 300;
-  typeLines(
-    document.getElementById('term-body'),
-    [
-      { text: '$ boot --system helix --mode ssl',        cls: 'prompt', delay: 200,  dur: 460 },
-      { text: 'SYS ONLINE ....................... [OK]',  cls: '',       delay: 900,  dur: 390 },
-      { text: 'LOADING BAYESIAN CORE ........... [OK]',  cls: '',       delay: 1400, dur: 400 },
-      { text: 'FRAMEWORK INITIALIZING .......... [OK]',  cls: '',       delay: 1920, dur: 410 },
-      { text: 'SSL PIPELINE READY .............. [OK]',  cls: '',       delay: 2450, dur: 390 },
-      { text: '$ ',                                      cls: 'prompt', delay: 3000, dur: 40  },
-    ],
-    TERM_APPEAR,
-    'term-cursor'
-  );
+/* ══════════════════════════════════════════
+   ON LOAD — DESIGNATION SEQUENCE
+══════════════════════════════════════════ */
+function runDesignation() {
+  document.getElementById('crt-title').textContent = 'helix  —  designation';
+  const body = document.getElementById('crt-body');
+  body.innerHTML = '';
+  typeLines(body, [
+    { html: '&gt; DECODING DESIGNATION...',                                                       cls: 'dim',    delay: 200,  dur: 320 },
+    { html: '<span class="crt-hl">H</span> &nbsp;──&nbsp; HEP',                                  cls: '',       delay: 700,  dur: 240 },
+    { html: '<span class="crt-hl">E</span> &nbsp;──&nbsp; EPISTEMIC',                            cls: '',       delay: 1100, dur: 260 },
+    { html: '<span class="crt-hl">L</span> &nbsp;──&nbsp; LEARNING',                             cls: '',       delay: 1480, dur: 240 },
+    { html: '<span class="crt-hl">I</span> &nbsp;──&nbsp; INTELLIGENT AI',                       cls: '',       delay: 1840, dur: 280 },
+    { html: '<span class="crt-hl">X</span> &nbsp;──&nbsp; EXPLORATION',                          cls: '',       delay: 2200, dur: 250 },
+    { html: '&gt; CONFIRMED',                                                                     cls: 'dim',    delay: 2700, dur: 160 },
+  ], 'crt-cursor');
 }
-
-/* ── ACRONYM PANEL ── */
-function runAcronym() {
-  const TERM_APPEAR  = 300;
-  const ACRO_APPEAR  = TERM_APPEAR + 3000 + 40 + 700;
-  setTimeout(() => {
-    const panel = document.getElementById('acro-panel');
-    panel.style.opacity = '';
-    panel.classList.add('show');
-    typeLines(
-      document.getElementById('acro-body'),
-      [
-        { html: '&gt; DECODING DESIGNATION...',                            cls: 'acro-line dim', delay: 300,  dur: 320 },
-        { html: '<span class="acro-hl">H</span>  ──  HEP',                cls: 'acro-line',     delay: 760,  dur: 240 },
-        { html: '<span class="acro-hl">E</span>  ──  EPISTEMIC',          cls: 'acro-line',     delay: 1140, dur: 260 },
-        { html: '<span class="acro-hl">L</span>  ──  LEARNING',           cls: 'acro-line',     delay: 1500, dur: 240 },
-        { html: '<span class="acro-hl">I</span>  ──  INTELLIGENT AI',     cls: 'acro-line',     delay: 1860, dur: 280 },
-        { html: '<span class="acro-hl">X</span>  ──  EXPLORATION',        cls: 'acro-line',     delay: 2220, dur: 250 },
-        { html: '&gt; CONFIRMED',                                          cls: 'acro-line dim', delay: 2740, dur: 160 },
-      ],
-      0,
-      'acro-cursor'
-    );
-  }, ACRO_APPEAR);
-}
-
-runTerminal();
-runAcronym();
 
 /* ══════════════════════════════════════════
-   ENTER → ./init SEQUENCE → TRANSITION
+   ON ENTER — INIT SEQUENCE → TRANSITION
 ══════════════════════════════════════════ */
 document.getElementById('init-btn').addEventListener('click', () => {
-  // disable button immediately
-  const btn = document.getElementById('init-btn');
+  const btn  = document.getElementById('init-btn');
+  const body = document.getElementById('crt-body');
+  const title= document.getElementById('crt-title');
+
   btn.style.pointerEvents = 'none';
   btn.style.opacity = '0.4';
 
-  const body = document.getElementById('term-body');
+  // clear designation, switch title
+  body.innerHTML = '';
+  title.textContent = 'helix  —  init';
 
-  // remove any lingering cursor
-  const old = body.querySelector('.term-cursor');
-  if (old) old.remove();
+  typeLines(body, [
+    { text: '$ ./init_script',                                          cls: 'prompt', delay: 0,    dur: 360 },
+    { html: 'SYS ONLINE ....................... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 560,  dur: 350 },
+    { html: 'LOADING BAYESIAN CORE ........... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 1120, dur: 380 },
+    { html: 'FRAMEWORK INITIALIZING .......... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 1680, dur: 390 },
+    { html: 'SSL PIPELINE READY .............. <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 2240, dur: 370 },
+  ], 'crt-cursor');
 
-  const initLines = [
-    { text: '$ ./init --launch helix', cls: 'prompt', delay: 0,    dur: 380 },
-    { text: 'LOADING MODULES ......... [OK]',          delay: 520,  dur: 320 },
-    { text: 'ESTABLISHING LINK ....... [OK]',          delay: 980,  dur: 320 },
-    { text: 'HANDSHAKE COMPLETE ...... [OK]',          delay: 1440, dur: 320 },
-    { text: 'LAUNCHING ...',            cls: 'prompt', delay: 1900, dur: 200 },
-  ];
-
-  let cursor = null;
-  initLines.forEach(({ text, cls, delay, dur }) => {
-    const steps = Math.max(10, Math.round(text.length * 1.1));
-    setTimeout(() => {
-      if (cursor) cursor.remove();
-      const el = document.createElement('div');
-      el.className = 'term-line' + (cls ? ' ' + cls : '');
-      el.textContent = text;
-      el.style.setProperty('--dur',   dur + 'ms');
-      el.style.setProperty('--steps', steps);
-      el.classList.add('expand');
-      body.appendChild(el);
-      cursor = document.createElement('span');
-      cursor.className   = 'term-cursor';
-      cursor.textContent = '█';
-      el.appendChild(cursor);
-      body.scrollTop = body.scrollHeight;
-    }, delay);
-  });
-
-  // fire transition after init sequence finishes
+  // transition fires at 3 seconds
   setTimeout(() => {
     const sw = document.getElementById('scan-wipe');
     const bl = document.getElementById('bloom');
@@ -574,33 +462,23 @@ document.getElementById('init-btn').addEventListener('click', () => {
     bl.classList.add('flash');
     bk.classList.add('fadeout');
     setTimeout(() => {
-      // ── NAVIGATE TO HUB ──
       window.location.href = 'main.html';
-      // ──────────────────────────────────────
-
-      // reset transition overlay
-      [sw, bl, bk].forEach(el => el.className = '');
-
-      // reset terminals
-      document.getElementById('term-body').innerHTML = '';
-      document.getElementById('acro-body').innerHTML = '';
-
-      // reset acronym panel
-      const panel = document.getElementById('acro-panel');
-      panel.classList.remove('show');
-      panel.style.opacity = '0';
-
-      // reset button
-      btn.style.pointerEvents = '';
-      btn.style.opacity = '';
-
-      // re-run boot sequences
-      runTerminal();
-      runAcronym();
-
     }, 1950);
-  }, 2300);
+  }, 3000);
 });
+
+/* ══════════════════════════════════════════
+   BFCACHE RESET
+══════════════════════════════════════════ */
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  const btn = document.getElementById('init-btn');
+  btn.style.pointerEvents = '';
+  btn.style.opacity = '';
+  runDesignation();
+});
+
+runDesignation();
 </script>
 </body>
 </html>
