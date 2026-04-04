@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>H.E.L.I.X — Hub</title>
 <link rel="icon" type="image/x-icon" href="assets/img/helix_64.ico">
-<!-- Open Graph / Social Media -->
 <meta property="og:title"       content="H.E.L.I.X — Navigation Hub">
 <meta property="og:description" content="HEP · Epistemic · Learning · Intelligent AI · Exploration">
 <meta property="og:image"       content="https://n-herling-mk1.github.io/_HELIX_/assets/img/Soc_media_tag.png">
@@ -30,29 +29,17 @@
 <div class="corner bl"></div>
 <div class="corner br"></div>
 
-<!-- TOPBAR -->
+<!-- MINIMAL TOPBAR -->
 <header class="topbar">
   <span class="topbar-label">NAVIGATION HUB</span>
-
-  <div class="topbar-center">
-    <div class="topbar-logo">
-      H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X
-    </div>
-    <div class="topbar-status">
-      <span class="topbar-dot"></span>
-      <span class="topbar-online">SYSTEM ONLINE</span>
-    </div>
-  </div>
-
   <a href="index.html" class="topbar-back">← RETURN TO SPLASH</a>
 </header>
 
 <!-- HUB BODY -->
 <div class="hub-body">
 
-  <!-- LEFT NAV RAIL -->
+  <!-- LEFT NAV RAIL — full height -->
   <nav class="nav-rail">
-    <span class="rail-header">SECTOR</span>
 
     <!-- SECTOR IMAGE BOX -->
     <div class="rail-img-box" id="rail-img-box">
@@ -62,31 +49,31 @@
     <button class="sector-btn" data-sector="H">
       <span class="btn-letter">H</span>
       <span class="btn-word">HEP</span>
-      <span class="btn-count">3 ARTICLES</span>
+      <span class="btn-count"></span>
     </button>
 
     <button class="sector-btn" data-sector="E">
       <span class="btn-letter">E</span>
       <span class="btn-word">EPISTEMIC</span>
-      <span class="btn-count">3 ARTICLES</span>
+      <span class="btn-count"></span>
     </button>
 
     <button class="sector-btn" data-sector="L">
       <span class="btn-letter">L</span>
       <span class="btn-word">LEARNING</span>
-      <span class="btn-count">3 ARTICLES</span>
+      <span class="btn-count"></span>
     </button>
 
     <button class="sector-btn" data-sector="I">
       <span class="btn-letter">I</span>
       <span class="btn-word">INTELLIGENT AI</span>
-      <span class="btn-count">2 ARTICLES</span>
+      <span class="btn-count"></span>
     </button>
 
     <button class="sector-btn" data-sector="X">
       <span class="btn-letter">X</span>
       <span class="btn-word">EXPLORATION</span>
-      <span class="btn-count">3 ARTICLES</span>
+      <span class="btn-count"></span>
     </button>
 
     <div class="rail-footer">
@@ -95,33 +82,83 @@
         HELIX ONLINE
       </div>
     </div>
+
   </nav>
 
   <!-- CONTENT PANEL -->
   <section class="content-panel">
 
-    <div class="panel-header" id="panel-header">
-      <div class="panel-sector-tag" id="panel-sector-tag">—</div>
-      <div class="panel-title-block">
-        <div class="panel-sector-name"  id="panel-sector-name">SELECT A SECTOR</div>
-        <div class="panel-article-count" id="panel-article-count">USE THE NAV RAIL ←</div>
+    <!-- H·E·L·I·X HEADER — 3 columns: logo | buttons centered | sector info -->
+    <div class="content-header">
+
+      <div class="content-header-left">
+        <div class="content-logo">
+          H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X
+        </div>
+        <div class="content-status">
+          <span class="content-dot"></span>
+          <span class="content-online">SYSTEM ONLINE</span>
+        </div>
       </div>
+
+      <!-- TAB BUTTONS — always visible, centered -->
+      <div class="subtab-bar" id="subtab-bar">
+        <button class="subtab" data-tab="articles">ARTICLES</button>
+        <button class="subtab" data-tab="notes">NOTES</button>
+        <button class="subtab" data-tab="goals">GOALS</button>
+      </div>
+
+      <!-- SECTOR INFO — right -->
+      <div class="content-sector-info" id="content-sector-info">
+        <span class="content-sector-letter" id="content-sector-letter"></span>
+        <span class="content-sector-name" id="content-sector-name"></span>
+      </div>
+
     </div>
 
     <div class="panel-empty" id="panel-empty">
       <div class="empty-glyph">H·E·L·I·X</div>
-      <div class="empty-label">SELECT A SECTOR TO ACCESS ARTICLES</div>
+
+      <!-- State 1: no tab selected -->
+      <div class="empty-msg" id="empty-msg-1">
+        SELECT&nbsp;<span class="empty-tab-hint">[ARTICLES]</span>&nbsp;
+        <span class="empty-tab-hint">[NOTES]</span>&nbsp;
+        <span class="empty-tab-hint">[GOALS]</span>&nbsp;TO GET STARTED
+      </div>
+
+      <!-- State 2: tab selected, awaiting sector -->
+      <div class="empty-msg hidden" id="empty-msg-2">
+        <div class="empty-sector-prompt">SELECT A SECTOR FROM THE LEFT PANEL</div>
+        <div class="empty-sector-list">
+          <div class="empty-sector-item" data-sector="H"><span class="esl esl-H">H</span> — HEP</div>
+          <div class="empty-sector-item" data-sector="E"><span class="esl esl-E">E</span> — EPISTEMIC</div>
+          <div class="empty-sector-item" data-sector="L"><span class="esl esl-L">L</span> — LEARNING</div>
+          <div class="empty-sector-item" data-sector="I"><span class="esl esl-I">I</span> — INTELLIGENT AI</div>
+          <div class="empty-sector-item" data-sector="X"><span class="esl esl-X">X</span> — EXPLORATION</div>
+        </div>
+      </div>
     </div>
 
+    <!-- CONTENT LIST -->
     <div class="article-list" id="article-list" style="display:none;"></div>
 
+    <!-- PDF VIEWER -->
     <div class="viewer-panel" id="viewer-panel">
       <div class="viewer-topbar">
         <button class="viewer-back" id="viewer-back">← BACK TO LIST</button>
         <span class="viewer-doc-title" id="viewer-doc-title"></span>
         <a class="viewer-dl-btn" id="viewer-dl" href="#" download>↓ DOWNLOAD</a>
       </div>
-      <iframe class="viewer-frame" id="viewer-frame" src="" title="Document Viewer"></iframe>
+      <div class="viewer-wrap">
+        <iframe class="viewer-frame" id="viewer-frame" src="" title="Document Viewer"></iframe>
+        <div class="viewer-grain" id="viewer-grain">
+          <div class="viewer-error-msg">
+            <div class="viewer-error-code">404</div>
+            <div class="viewer-error-label">FILE NOT FOUND</div>
+            <div class="viewer-error-sub">PDF has not been uploaded yet</div>
+          </div>
+        </div>
+      </div>
     </div>
 
   </section>
