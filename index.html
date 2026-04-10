@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>H.E.L.I.X</title>
+<link rel="icon" type="image/x-icon" href="assets/img/helix_64.ico">
+<!-- Open Graph / Social Media -->
+<meta property="og:title"       content="H.E.L.I.X">
+<meta property="og:description" content="HEP · Epistemic · Learning · Intelligent AI · Exploration">
+<meta property="og:image"       content="https://n-herling-mk1.github.io/_HELIX_/assets/img/Soc_media_tag.png">
+<meta property="og:url"         content="https://n-herling-mk1.github.io/_HELIX_/">
+<meta property="og:type"        content="website">
+<meta name="twitter:card"       content="summary_large_image">
+<meta name="twitter:title"      content="H.E.L.I.X">
+<meta name="twitter:image"      content="https://n-herling-mk1.github.io/_HELIX_/assets/img/Soc_media_tag.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Press+Start+2P&family=Exo+2:wght@200;300;400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cyan:      #00e5ff;
+  --cyan-mid:  #00b3cc;
+  --cyan-dim:  #007a8c;
+  --orange:    #ff6a00;
+  --bg:        #020c14;
+  --text:      #89ccd9;
+  --text-dim:  #3a6a78;
+  --green:     #00ff41;
+  --green-dim: #009929;
+  --glow-c:    rgba(0,229,255,0.55);
+  --glow-o:    rgba(255,106,0,0.5);
+  --glow-g:    rgba(0,255,65,0.65);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { width:100%; height:100%; background:var(--bg); overflow:hidden; font-family:'Exo 2',sans-serif; color:var(--text); }
+
+/* ── BACKGROUND ── */
+.grid-bg {
+  position:fixed; inset:0; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.04) 1px, transparent 1px);
+  background-size:48px 48px;
+}
+.grid-bg::before {
+  content:''; position:absolute; inset:0;
+  background-image:
+    linear-gradient(135deg, rgba(0,229,255,0.025) 25%, transparent 25%),
+    linear-gradient(45deg,  rgba(0,229,255,0.025) 25%, transparent 25%);
+  background-size:96px 96px;
+}
+.scanlines {
+  position:fixed; inset:0; z-index:5; pointer-events:none;
+  background:repeating-linear-gradient(0deg, transparent, transparent 3px, rgba(0,0,0,0.09) 3px, rgba(0,0,0,0.09) 4px);
+}
+.vignette {
+  position:fixed; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(ellipse at center, transparent 25%, rgba(2,12,20,0.7) 75%, rgba(2,12,20,0.97) 100%);
+}
+
+/* ── CANVAS ── */
+#bg-canvas, #helix-canvas { position:fixed; top:0; left:0; pointer-events:none; }
+#bg-canvas    { z-index:1; }
+#helix-canvas { z-index:2; }
+
+/* ── CORNERS + HLINES ── */
+.corner { position:fixed; width:56px; height:56px; z-index:20; }
+.corner::before, .corner::after { content:''; position:absolute; background:var(--cyan); box-shadow:0 0 8px var(--glow-c); }
+.corner::before { width:2px; height:100%; top:0; left:0; }
+.corner::after  { width:100%; height:2px; top:0; left:0; }
+.corner.tl { top:22px; left:22px; }
+.corner.tr { top:22px; right:22px; transform:scaleX(-1); }
+.corner.bl { bottom:22px; left:22px; transform:scaleY(-1); }
+.corner.br { bottom:22px; right:22px; transform:scale(-1,-1); }
+.hline { position:fixed; left:0; right:0; height:1px; z-index:3; pointer-events:none;
+  background:linear-gradient(90deg, transparent 0%, rgba(0,229,255,0.12) 15%, rgba(0,229,255,0.12) 85%, transparent 100%); }
+.hline.top { top:72px; } .hline.bottom { bottom:72px; }
+
+/* ── TITLE — fixed vertically centered ── */
+.title-center {
+  position:fixed; top:50%; left:50%;
+  transform:translate(-50%, -50%);
+  z-index:10;
+  display:flex; flex-direction:column; align-items:center;
+  pointer-events:none;
+}
+.title-wrap {
+  display:flex; align-items:baseline;
+  opacity:0; animation:rise 1s ease 0.9s forwards;
+}
+.title {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(5rem,14vw,12rem); font-weight:900;
+  letter-spacing:0.18em; color:#fff; line-height:1;
+  text-shadow:0 0 22px var(--glow-c), 0 0 60px rgba(0,229,255,0.3), 0 0 120px rgba(0,229,255,0.12);
+}
+.dot {
+  font-family:'Orbitron',monospace;
+  font-size:clamp(2.2rem,5.5vw,5rem); font-weight:900;
+  color:var(--orange); text-shadow:0 0 16px var(--glow-o);
+  line-height:1; align-self:center; padding:0 0.04em;
+}
+.divider {
+  margin:1.2rem auto 0; height:1px;
+  background:linear-gradient(90deg, transparent, var(--cyan) 40%, var(--orange) 60%, transparent);
+  box-shadow:0 0 10px var(--glow-c);
+  width:0; animation:expand 0.9s cubic-bezier(.22,1,.36,1) 1.4s forwards;
+}
+
+/* ── SINGLE CRT TERMINAL — centered, top ── */
+.crt-panel {
+  position:fixed;
+  top:88px;
+  left:0;
+  right:0;
+  margin:0 auto;
+  width:clamp(400px,58vw,700px);
+  border:1px solid var(--cyan);
+  background:rgba(0,0,0,0.96);
+  box-shadow:
+    0 0 0 1px rgba(0,229,255,0.15),
+    0 0 20px rgba(0,229,255,0.2),
+    0 8px 48px rgba(0,0,0,0.9);
+  z-index:10;
+  overflow:hidden;
+  opacity:0; animation:rise 0.7s ease 0.3s forwards;
+}
+.crt-panel::after {
+  content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
+  background:repeating-linear-gradient(0deg,
+    transparent, transparent 3px,
+    rgba(0,0,0,0.08) 3px, rgba(0,0,0,0.08) 4px);
+}
+.crt-panel::before { display:none; }
+.crt-bar {
+  display:flex; align-items:center; gap:6px;
+  padding:9px 16px;
+  background:rgba(255,255,255,0.04);
+  border-bottom:1px solid var(--cyan-dim);
+}
+.crt-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.crt-dot.r { background:#ff5f56; }
+.crt-dot.y { background:#ffbd2e; }
+.crt-dot.g { background:#27c93f; }
+.crt-title {
+  font-family:'Share Tech Mono',monospace;
+  font-size:0.62rem; letter-spacing:0.22em;
+  color:var(--cyan-dim); text-transform:uppercase; margin-left:4px;
+}
+.crt-body {
+  padding:16px 20px 18px;
+  height:230px;
+  overflow:hidden;
+  display:flex; flex-direction:column; gap:5px;
+  position:relative; z-index:2;
+}
+.crt-line {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.7rem,1.2vw,0.88rem);
+  letter-spacing:0.08em; line-height:1.6;
+  white-space:nowrap; overflow:hidden;
+  color:#ffffff;
+  text-shadow:none;
+  max-width:0; flex-shrink:0;
+}
+.crt-line.dim    { color:rgba(255,255,255,0.45); }
+.crt-line.prompt { color:#ffffff; font-weight:bold; }
+.crt-hl          { color:#00e5ff; }
+.crt-cursor {
+  font-family:'Share Tech Mono',monospace;
+  font-size:clamp(0.7rem,1.2vw,0.88rem);
+  color:#ffffff;
+  animation:blink 1s step-end infinite;
+}
+.crt-line.ok { color:var(--green); text-shadow:0 0 6px var(--glow-g); }
+.crt-line.expand { animation:type-out var(--dur,0.5s) steps(var(--steps,30),end) forwards; }
+
+/* ── ENTER BUTTON ── */
+.init-btn {
+  position:fixed; bottom:130px;
+  left:0; right:0; margin:0 auto;
+  width:fit-content;
+  font-family:'Orbitron',monospace;
+  font-size:clamp(1.05rem,2.1vw,1.4rem); font-weight:700;
+  letter-spacing:0.52em; color:var(--bg);
+  background:var(--cyan); border:none;
+  padding:22px 90px; cursor:pointer;
+  clip-path:polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  overflow:hidden;
+  z-index:20;
+  opacity:0;
+  animation:rise 1s ease 3.2s forwards, pulse-btn 2.2s ease-in-out 4.4s infinite;
+  transition:background 0.15s, color 0.15s;
+  white-space:nowrap;
+}
+.init-btn::before {
+  content:''; position:absolute;
+  top:0; left:-60%; width:55%; height:100%;
+  background:linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%);
+  animation:sheen 2.4s linear 4.6s infinite;
+}
+.init-btn:hover { background:#fff; color:var(--bg); }
+@keyframes sheen { 0%{left:-60%} 100%{left:115%} }
+
+/* ── TRANSITION OVERLAY ── */
+#transition { position:fixed; inset:0; z-index:100; pointer-events:none; }
+#scan-wipe {
+  position:absolute; left:0; right:0; height:110%; top:-110%;
+  background:repeating-linear-gradient(0deg, rgba(0,229,255,0.2) 0px, rgba(0,229,255,0.2) 2px, transparent 2px, transparent 6px);
+  box-shadow:0 0 60px rgba(0,229,255,0.6), 0 0 120px rgba(0,229,255,0.3);
+}
+#bloom {
+  position:absolute; inset:0;
+  background:radial-gradient(ellipse at center, rgba(0,229,255,0.92) 0%, rgba(0,229,255,0) 70%);
+  opacity:0;
+}
+#blackout { position:absolute; inset:0; background:var(--bg); opacity:0; }
+.sweep   { animation:scan-sweep 0.7s ease-in forwards; }
+.flash   { animation:bloom-flash 1.0s ease forwards 0.45s; }
+.fadeout { animation:fade-black 0.5s ease forwards 1.3s; }
+
+/* ── KEYFRAMES ── */
+@keyframes rise       { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+@keyframes expand     { from{width:0} to{width:min(480px,55vw)} }
+@keyframes blink      { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse-btn  {
+  0%,100%{ box-shadow:0 0 14px var(--glow-c), 0 0 0 0 rgba(0,229,255,0); }
+  50%    { box-shadow:0 0 30px var(--glow-c), 0 0 0 9px rgba(0,229,255,0.07); }
+}
+@keyframes scan-sweep { from{top:-110%} to{top:110%} }
+@keyframes bloom-flash { 0%{opacity:0;transform:scale(0.5)} 35%{opacity:1;transform:scale(1.05)} 100%{opacity:0;transform:scale(1.4)} }
+@keyframes fade-black  { from{opacity:0} to{opacity:1} }
+@keyframes type-out    { from{max-width:0} to{max-width:100%} }
+</style>
+<script data-goatcounter="https://helix-nherling.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</head>
+<body>
+
+<div class="grid-bg"></div>
+<div class="vignette"></div>
+<div class="scanlines"></div>
+
+<canvas id="bg-canvas"></canvas>
+<canvas id="helix-canvas"></canvas>
+
+<div class="hline top"></div>
+<div class="hline bottom"></div>
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div id="transition">
+  <div id="scan-wipe"></div>
+  <div id="bloom"></div>
+  <div id="blackout"></div>
+</div>
+
+<!-- TITLE -->
+<div class="title-center">
+  <div class="title-wrap">
+    <span class="title">H</span><span class="dot">·</span>
+    <span class="title">E</span><span class="dot">·</span>
+    <span class="title">L</span><span class="dot">·</span>
+    <span class="title">I</span><span class="dot">·</span>
+    <span class="title">X</span>
+  </div>
+  <div class="divider"></div>
+</div>
+
+<!-- SINGLE CRT TERMINAL -->
+<div class="crt-panel" id="crt-panel">
+  <div class="crt-bar">
+    <div class="crt-dot r"></div>
+    <div class="crt-dot y"></div>
+    <div class="crt-dot g"></div>
+    <span class="crt-title" id="crt-title">helix &nbsp;—&nbsp; designation</span>
+  </div>
+  <div class="crt-body" id="crt-body"></div>
+</div>
+
+<!-- ENTER BUTTON -->
+<button class="init-btn" id="init-btn">ENTER</button>
+
+<script>
+/* ══════════════════════════════════════════
+   PARTICLE FIELD
+══════════════════════════════════════════ */
+const bgCanvas = document.getElementById('bg-canvas');
+const bgCtx    = bgCanvas.getContext('2d');
+const hCanvas  = document.getElementById('helix-canvas');
+const hCtx     = hCanvas.getContext('2d');
+let W = 0, H = 0;
+
+function resize() {
+  W = bgCanvas.width = hCanvas.width  = window.innerWidth;
+  H = bgCanvas.height = hCanvas.height = window.innerHeight;
+}
+
+const PARTICLE_COUNT = 200;
+const particles = [];
+function mkParticle(full) {
+  return { x:Math.random()*(W||1400), y:full?Math.random()*(H||900):-8, vx:(Math.random()-0.5)*0.24, vy:0.07+Math.random()*0.3, r:0.5+Math.random()*1.5, a:0.04+Math.random()*0.26, cyan:Math.random()>0.4 };
+}
+function initParticles() { particles.length=0; for(let i=0;i<PARTICLE_COUNT;i++) particles.push(mkParticle(true)); }
+function drawParticles() {
+  bgCtx.clearRect(0,0,W,H);
+  for(const p of particles) {
+    bgCtx.save(); bgCtx.globalAlpha=p.a; bgCtx.fillStyle=p.cyan?'#00e5ff':'#ff6a00';
+    bgCtx.shadowBlur=5; bgCtx.shadowColor=p.cyan?'rgba(0,229,255,0.7)':'rgba(255,106,0,0.7)';
+    bgCtx.beginPath(); bgCtx.arc(p.x,p.y,p.r,0,Math.PI*2); bgCtx.fill(); bgCtx.restore();
+    p.x+=p.vx; p.y+=p.vy; p.vx+=(Math.random()-0.5)*0.009; p.vx=Math.max(-0.38,Math.min(0.38,p.vx));
+    if(p.y>H+10) Object.assign(p,mkParticle(false));
+  }
+}
+
+/* ══════════════════════════════════════════
+   HELIX RENDERER
+══════════════════════════════════════════ */
+const PAIRS = ['A—T','T—A','G—C','C—G'];
+let phase = 0;
+function drawHelix() {
+  hCtx.clearRect(0,0,W,H);
+  const cx=W/2, cy=H/2, radius=Math.min(W,H)*0.082, hHeight=H*0.44;
+  const RUNGS=24, TURNS=3.2, spacing=hHeight/RUNGS;
+  const s1=[],s2=[];
+  for(let i=0;i<=RUNGS;i++){
+    const y=cy-hHeight/2+i*spacing, a=phase+(i/RUNGS)*TURNS*Math.PI*2;
+    s1.push({x:cx+radius*Math.cos(a),           y, d:(Math.sin(a)+1)/2});
+    s2.push({x:cx+radius*Math.cos(a+Math.PI),   y, d:(Math.sin(a+Math.PI)+1)/2});
+  }
+  const rungs=[];
+  for(let i=0;i<RUNGS;i++) rungs.push({x1:s1[i].x,y1:s1[i].y,x2:s2[i].x,y2:s2[i].y,depth:(s1[i].d+s2[i].d)/2,d1:s1[i].d,d2:s2[i].d,idx:i});
+  rungs.sort((a,b)=>a.depth-b.depth);
+  for(const r of rungs){
+    const isCyan=r.idx%2===0, col=isCyan?'#00e5ff':'#ff6a00', glow=isCyan?'rgba(0,229,255,0.85)':'rgba(255,106,0,0.85)';
+    hCtx.save();
+    hCtx.globalAlpha=0.14+r.depth*0.72; hCtx.strokeStyle=col; hCtx.lineWidth=1.3+r.depth*1.0;
+    hCtx.shadowBlur=r.depth*14; hCtx.shadowColor=glow;
+    hCtx.beginPath(); hCtx.moveTo(r.x1,r.y1); hCtx.lineTo(r.x2,r.y2); hCtx.stroke();
+    [[r.x1,r.y1,r.d1,isCyan?'#00e5ff':'#ff6a00'],[r.x2,r.y2,r.d2,isCyan?'#ff6a00':'#00e5ff']].forEach(([x,y,d,c])=>{
+      hCtx.globalAlpha=0.18+d*0.78; hCtx.fillStyle=c; hCtx.shadowBlur=d*12; hCtx.shadowColor=c;
+      hCtx.beginPath(); hCtx.arc(x,y,1.7+d*2.3,0,Math.PI*2); hCtx.fill();
+    });
+    if(r.depth>0.52){
+      const fa=Math.pow((r.depth-0.52)/0.48,1.8)*0.72, fs=8.5+r.depth*3.5;
+      const mx=(r.x1+r.x2)/2, my=(r.y1+r.y2)/2;
+      hCtx.globalAlpha=fa; hCtx.font=`400 ${fs.toFixed(1)}px 'Share Tech Mono',monospace`;
+      hCtx.fillStyle=isCyan?'#00e5ff':'#ff9244'; hCtx.textAlign='center'; hCtx.textBaseline='middle';
+      hCtx.shadowBlur=8*r.depth; hCtx.shadowColor=isCyan?'rgba(0,229,255,0.95)':'rgba(255,106,0,0.95)';
+      hCtx.fillText(PAIRS[r.idx%PAIRS.length],mx,my);
+    }
+    hCtx.restore();
+  }
+  function strand(pts,col,sc){
+    for(let i=0;i<pts.length-1;i++){
+      const p=pts[i],q=pts[i+1];
+      hCtx.save(); hCtx.globalAlpha=0.3+p.d*0.7; hCtx.strokeStyle=col; hCtx.lineWidth=1.5+p.d*3.2;
+      hCtx.lineCap='round'; hCtx.shadowBlur=p.d*22; hCtx.shadowColor=sc;
+      hCtx.beginPath(); hCtx.moveTo(p.x,p.y); hCtx.lineTo(q.x,q.y); hCtx.stroke(); hCtx.restore();
+    }
+  }
+  strand(s1,'#00e5ff','rgba(0,229,255,0.9)');
+  strand(s2,'#ff6a00','rgba(255,106,0,0.9)');
+  for(const p of [...s1,...s2]){
+    if(p.d<0.76) continue;
+    hCtx.save(); hCtx.globalAlpha=(p.d-0.76)*3.8; hCtx.fillStyle='#fff';
+    hCtx.shadowBlur=14; hCtx.shadowColor='#00e5ff';
+    hCtx.beginPath(); hCtx.arc(p.x,p.y,2.2*p.d,0,Math.PI*2); hCtx.fill(); hCtx.restore();
+  }
+}
+
+/* ══════════════════════════════════════════
+   ANIMATION LOOP
+══════════════════════════════════════════ */
+let last=0;
+function loop(ts){
+  const dt=Math.min((ts-last)/16.67,2)||1; last=ts;
+  phase+=0.005*dt; drawParticles(); drawHelix(); requestAnimationFrame(loop);
+}
+window.addEventListener('resize',()=>{resize();initParticles();});
+resize(); initParticles(); requestAnimationFrame(loop);
+
+/* ══════════════════════════════════════════
+   TYPE UTILITY
+══════════════════════════════════════════ */
+function stripTags(html){ return html.replace(/<[^>]*>/g,''); }
+
+function typeLines(container, lines, cursorClass) {
+  let cursorEl = null;
+  lines.forEach(({ html, text, cls, delay, dur }) => {
+    const content = html || text || '';
+    const isHtml  = !!html;
+    const visible = stripTags(content);
+    const steps   = Math.max(10, Math.round(visible.length * 1.1));
+    setTimeout(() => {
+      if (cursorEl) cursorEl.remove();
+      const el = document.createElement('div');
+      el.className = 'crt-line' + (cls ? ' ' + cls : '');
+      if (isHtml) el.innerHTML = content;
+      else        el.textContent = content;
+      el.style.setProperty('--dur',   dur + 'ms');
+      el.style.setProperty('--steps', steps);
+      el.classList.add('expand');
+      container.appendChild(el);
+      cursorEl = document.createElement('span');
+      cursorEl.className   = cursorClass;
+      cursorEl.textContent = '█';
+      el.appendChild(cursorEl);
+      container.scrollTop = container.scrollHeight;
+    }, delay);
+  });
+}
+
+/* ══════════════════════════════════════════
+   ON LOAD — DESIGNATION SEQUENCE
+══════════════════════════════════════════ */
+function runDesignation() {
+  document.getElementById('crt-title').textContent = 'helix  —  designation';
+  const body = document.getElementById('crt-body');
+  body.innerHTML = '';
+  typeLines(body, [
+    { html: '&gt; DECODING DESIGNATION...',                                                       cls: 'dim',    delay: 200,  dur: 320 },
+    { html: '<span class="crt-hl">H</span> &nbsp;──&nbsp; HEP',                                  cls: '',       delay: 700,  dur: 240 },
+    { html: '<span class="crt-hl">E</span> &nbsp;──&nbsp; EPISTEMIC',                            cls: '',       delay: 1100, dur: 260 },
+    { html: '<span class="crt-hl">L</span> &nbsp;──&nbsp; LEARNING',                             cls: '',       delay: 1480, dur: 240 },
+    { html: '<span class="crt-hl">I</span> &nbsp;──&nbsp; INTELLIGENT AI',                       cls: '',       delay: 1840, dur: 280 },
+    { html: '<span class="crt-hl">X</span> &nbsp;──&nbsp; EXPLORATION',                          cls: '',       delay: 2200, dur: 250 },
+    { html: '&gt; CONFIRMED',                                                                     cls: 'dim',    delay: 2700, dur: 160 },
+  ], 'crt-cursor');
+}
+
+/* ══════════════════════════════════════════
+   ON ENTER — INIT SEQUENCE → TRANSITION
+══════════════════════════════════════════ */
+document.getElementById('init-btn').addEventListener('click', () => {
+  const btn  = document.getElementById('init-btn');
+  const body = document.getElementById('crt-body');
+  const title= document.getElementById('crt-title');
+
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '0.4';
+
+  // clear designation, switch title
+  body.innerHTML = '';
+  title.textContent = 'helix  —  init';
+
+  typeLines(body, [
+    { text: '$ ./init_script',                                          cls: 'prompt', delay: 0,    dur: 360 },
+    { html: 'SYS ONLINE ....................... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 560,  dur: 350 },
+    { html: 'LOADING BAYESIAN CORE ........... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 1120, dur: 380 },
+    { html: 'FRAMEWORK INITIALIZING .......... <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 1680, dur: 390 },
+    { html: 'SSL PIPELINE READY .............. <span class="crt-hl" style="color:var(--green);text-shadow:0 0 6px var(--glow-g)">[OK]</span>', cls: '', delay: 2240, dur: 370 },
+  ], 'crt-cursor');
+
+  // transition fires at 3 seconds
+  setTimeout(() => {
+    const sw = document.getElementById('scan-wipe');
+    const bl = document.getElementById('bloom');
+    const bk = document.getElementById('blackout');
+    sw.classList.add('sweep');
+    bl.classList.add('flash');
+    bk.classList.add('fadeout');
+    setTimeout(() => {
+      window.location.href = 'main.html';
+    }, 1950);
+  }, 3000);
+});
+
+/* ══════════════════════════════════════════
+   BFCACHE RESET
+══════════════════════════════════════════ */
+window.addEventListener('pageshow', (e) => {
+  if (!e.persisted) return;
+  const btn = document.getElementById('init-btn');
+  btn.style.pointerEvents = '';
+  btn.style.opacity = '';
+  runDesignation();
+});
+
+runDesignation();
+</script>
+</body>
+</html>
