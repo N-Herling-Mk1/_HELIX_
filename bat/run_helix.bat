@@ -1,5 +1,5 @@
 @echo off
-title HELIX
+title HELIX SERVER
 color 0B
 echo.
 echo  H-E-L-I-X  starting...
@@ -12,10 +12,9 @@ timeout /t 1 /nobreak >nul
 :: install deps silently if missing
 python -m pip install flask flask-cors flask-socketio pywinpty --quiet --exists-action i 2>nul
 
-:: start server
-start "" python "%~dp0helix_server.py"
-timeout /t 2 /nobreak >nul
-start "" http://localhost:5000/control
+:: start server — helix_server.py lives in assets\py_progs\, NOT in bat\
+start "" python "%~dp0..\assets\py_progs\helix_server.py"
 
-echo  Server running. Close this window to stop.
+echo  Server starting on localhost:5000
+echo  Close this window to stop.
 pause >nul

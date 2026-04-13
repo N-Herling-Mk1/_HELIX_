@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stack — H.E.L.I.X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00e5ff; --cyan-mid:#00b3cc; --cyan-dim:#007a8c;
+  --orange:#ff6a00; --green:#00ff41; --purple:#b044ff;
+  --warn:#f5c400;
+  --bg:#020c14; --bg-card:rgba(6,15,26,0.92);
+  --text:#c8eef5; --dim:#6aabbc; --faint:#2e6878;
+  --border:rgba(0,229,255,0.14); --border-dim:rgba(0,229,255,0.07);
+  --glow-c:rgba(0,229,255,0.55); --glow-o:rgba(255,106,0,0.5);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'Exo 2',sans-serif;
+  min-height:100vh;padding:36px 48px 64px;
+}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.026) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.026) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
+}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;animation:rise 0.4s ease both;}
+
+/* ── IN PROGRESS BANNER ── */
+.wip-banner{
+  display:flex;align-items:center;gap:14px;
+  border:1px solid rgba(245,196,0,0.4);
+  background:rgba(245,196,0,0.05);
+  padding:12px 18px;margin-bottom:28px;
+  position:relative;overflow:hidden;
+}
+.wip-banner::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:3px;
+  background:var(--warn);box-shadow:0 0 10px var(--warn);
+}
+.wip-icon{font-size:15px;flex-shrink:0;}
+.wip-label{
+  font-family:'Orbitron',monospace;font-weight:700;
+  font-size:10px;letter-spacing:0.4em;color:var(--warn);
+  white-space:nowrap;
+}
+.wip-text{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:0.1em;color:var(--dim);
+}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{display:flex;align-items:center;gap:10px;margin-bottom:28px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:var(--faint);}
+.breadcrumb a{color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.breadcrumb a:hover{color:var(--cyan);}
+.breadcrumb .cur{color:var(--cyan);}
+
+/* ── MASTHEAD ── */
+.masthead{display:flex;flex-direction:column;gap:8px;border-bottom:1px solid var(--border);padding-bottom:22px;margin-bottom:32px;}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:2.4rem;letter-spacing:0.35em;color:#fff;
+  text-shadow:0 0 8px #fff,0 0 22px var(--cyan),0 0 55px rgba(0,229,255,0.4);line-height:1;}
+.logo .dot{color:var(--orange);text-shadow:0 0 14px var(--glow-o);font-size:0.55em;padding:0 0.04em;}
+.page-title{font-family:'Orbitron',monospace;font-weight:700;font-size:1.4rem;letter-spacing:0.28em;color:var(--cyan);text-shadow:0 0 16px var(--cyan);}
+.mast-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.28em;color:var(--faint);}
+
+/* ── SECTION ── */
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:16px;}
+.sec-line{flex:1;height:1px;background:linear-gradient(to right,var(--border) 0%,transparent 100%);}
+.sec-label{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:0.4em;color:var(--cyan);opacity:0.85;white-space:nowrap;}
+.section{margin-bottom:44px;}
+
+/* ── PROSE ── */
+.prose{font-family:'Exo 2',sans-serif;font-weight:300;font-size:14.5px;line-height:1.85;color:var(--dim);}
+.prose p+p{margin-top:14px;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose .hl{color:var(--cyan);}
+.prose .og{color:var(--orange);}
+.prose .gn{color:var(--green);}
+.prose code{
+  font-family:'Share Tech Mono',monospace;font-size:12px;
+  color:var(--cyan);background:rgba(0,229,255,0.06);
+  border:1px solid rgba(0,229,255,0.18);padding:1px 7px;
+}
+
+/* ── FLOW DIAGRAM ── */
+.flow{
+  display:flex;align-items:center;gap:0;
+  flex-wrap:wrap;margin:20px 0;
+}
+.flow-node{
+  border:1px solid var(--border);background:var(--bg-card);
+  padding:14px 18px;display:flex;flex-direction:column;gap:4px;
+  flex-shrink:0;
+}
+.flow-node.hl-c{border-color:rgba(0,229,255,0.4);}
+.flow-node.hl-o{border-color:rgba(255,106,0,0.4);}
+.flow-node.hl-g{border-color:rgba(0,255,65,0.4);}
+.flow-label{
+  font-family:'Orbitron',monospace;font-weight:700;
+  font-size:10px;letter-spacing:0.25em;
+}
+.flow-node.hl-c .flow-label{color:var(--cyan);}
+.flow-node.hl-o .flow-label{color:var(--orange);}
+.flow-node.hl-g .flow-label{color:var(--green);}
+.flow-sub{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.12em;color:var(--faint);}
+.flow-arrow{
+  font-family:'Share Tech Mono',monospace;font-size:18px;
+  color:var(--faint);padding:0 10px;flex-shrink:0;
+}
+
+/* ── IMAGE BLOCKS ── */
+.img-block{
+  border:1px solid var(--border-dim);background:var(--bg-card);
+  overflow:hidden;margin-bottom:10px;
+}
+.img-block img{
+  width:100%;display:block;
+  border-bottom:1px solid var(--border-dim);
+  opacity:0.88;transition:opacity 0.2s;
+}
+.img-block:hover img{opacity:1;}
+.img-caption{
+  padding:12px 16px;
+  display:flex;align-items:center;gap:10px;
+}
+.caption-tag{
+  font-family:'Orbitron',monospace;font-weight:700;
+  font-size:9px;letter-spacing:0.3em;
+  color:var(--warn);border:1px solid rgba(245,196,0,0.35);
+  padding:3px 9px;white-space:nowrap;flex-shrink:0;
+}
+.caption-text{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px;letter-spacing:0.1em;color:var(--dim);
+  line-height:1.5;
+}
+
+.img-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.img-grid-1{display:grid;grid-template-columns:1fr;gap:12px;}
+
+/* ── FOOTER ── */
+.page-footer{margin-top:48px;padding-top:16px;border-top:1px solid var(--border-dim);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-sig{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--faint);}
+.footer-sig span{color:var(--cyan-dim);}
+.page-back{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.2em;
+  color:var(--dim);text-decoration:none;border:1px solid var(--border);padding:8px 16px;
+  transition:color 0.2s,border-color 0.2s,background 0.2s;
+}
+.page-back:hover{color:var(--cyan);border-color:var(--cyan);background:rgba(0,229,255,0.05);}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:var(--cyan-dim);border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- PAGE IN PROGRESS -->
+  <div class="wip-banner">
+    <span class="wip-icon">⚠</span>
+    <span class="wip-label">PAGE IN PROGRESS</span>
+    <span class="wip-text">This page is being actively written. Content, screenshots, and captions are placeholders.</span>
+  </div>
+
+  <!-- BREADCRUMB -->
+  <div class="breadcrumb">
+    <a href="about.html">ABOUT</a>
+    <span>&nbsp;/&nbsp;</span>
+    <span class="cur">STACK</span>
+  </div>
+
+  <!-- MASTHEAD -->
+  <div class="masthead">
+    <div class="logo">H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X</div>
+    <div class="page-title">STACK</div>
+    <div class="mast-sub">LOCAL SERVER · GITHUB · STATIC SITE · PSEUDO-STACK</div>
+  </div>
+
+  <!-- WHAT IS THE STACK -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">THE CONCEPT</span><div class="sec-line"></div></div>
+    <div class="prose">
+      <p>
+        HELIX is not built on a traditional web stack. There is no framework, no build pipeline,
+        no package manager. It is <strong>plain HTML, CSS, and JavaScript</strong> — written
+        by hand, served locally, and pushed directly to GitHub Pages.
+      </p>
+      <p>
+        The <span class="hl">"stack"</span> is really a workflow: a <span class="og">local Flask server</span>
+        running on port 5000 acts as a dev environment with live endpoints, a terminal interface,
+        and a control panel. When work is ready, a <code>git push</code> deploys the static files
+        to <span class="gn">GitHub Pages</span> — no CI, no build step. The site just works.
+      </p>
+      <p>
+        It is a <strong>pseudo-stack</strong> — the local server provides dynamic capabilities
+        (real-time terminal, shell commands, file serving) that disappear on the public deployment,
+        where the site runs as pure static HTML. Both modes work. The architecture is intentionally
+        minimal.
+      </p>
+    </div>
+
+    <!-- FLOW -->
+    <div class="flow">
+      <div class="flow-node hl-c">
+        <div class="flow-label">EDITOR</div>
+        <div class="flow-sub">VS Code / any editor</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl-o">
+        <div class="flow-label">LOCAL SERVER</div>
+        <div class="flow-sub">Flask · port 5000</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl-c">
+        <div class="flow-label">BROWSER</div>
+        <div class="flow-sub">localhost:5000</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl-g">
+        <div class="flow-label">GIT PUSH</div>
+        <div class="flow-sub">GitHub Pages</div>
+      </div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node hl-g">
+        <div class="flow-label">LIVE SITE</div>
+        <div class="flow-sub">static · public</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IMAGES -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">IN ACTION</span><div class="sec-line"></div></div>
+
+    <!-- Server start -->
+    <div class="img-grid-1" style="margin-bottom:12px;">
+      <div class="img-block">
+        <img src="assets/img/helix_server_start.png" alt="HELIX server starting up" onerror="this.style.opacity='0.2'">
+        <div class="img-caption">
+          <span class="caption-tag">#_TO_DO</span>
+          <span class="caption-text">Caption: describe what's happening when the server starts — the PyQt6 tray launcher, fire animation, Flask boot sequence on port 5000.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Live action + kill process side by side -->
+    <div class="img-grid-2">
+      <div class="img-block">
+        <img src="assets/img/live_action_shot.png" alt="HELIX live in browser" onerror="this.style.opacity='0.2'">
+        <div class="img-caption">
+          <span class="caption-tag">#_TO_DO</span>
+          <span class="caption-text">Caption: the hub running live — what a dev session looks like, browser + editor side by side.</span>
+        </div>
+      </div>
+      <div class="img-block">
+        <img src="assets/img/kill_process.png" alt="Kill process control" onerror="this.style.opacity='0.2'">
+        <div class="img-caption">
+          <span class="caption-tag">#_TO_DO</span>
+          <span class="caption-text">Caption: the kill button — stopping the Flask server process cleanly from the PyQt6 tray launcher.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WHY THIS WAY -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">WHY THIS APPROACH</span><div class="sec-line"></div></div>
+    <div class="prose">
+      <p>
+        A research hub for one person doesn't need React, a database, or a deployment pipeline.
+        Every layer of abstraction is a layer that can break, slow things down, or demand maintenance.
+        <strong>The constraint is intentional:</strong> if it can be done in plain HTML and a
+        Python script, it should be.
+      </p>
+      <p>
+        The Flask server exists purely as a <span class="hl">local convenience</span> — it lets the
+        editor and terminal panels work during development without needing a full backend in production.
+        <span class="og">GitHub Pages</span> handles everything else for free, with zero configuration.
+      </p>
+      <p>
+        <span class="gn">#_TO_DO</span> — expand this section with more detail on the tradeoffs:
+        what the local server can do that the static site can't, and why that's acceptable.
+      </p>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a class="page-back" href="about.html">← BACK TO ABOUT</a>
+    <div class="footer-sig">H·E·L·I·X · <span>STACK</span> · N. HERLING</div>
+  </div>
+
+</div>
+</body>
+</html>

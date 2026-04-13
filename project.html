@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project — H.E.L.I.X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00e5ff; --cyan-mid:#00b3cc; --cyan-dim:#007a8c;
+  --orange:#ff6a00; --green:#00ff41; --purple:#b044ff;
+  --bg:#020c14; --bg-card:rgba(6,15,26,0.92);
+  --text:#c8eef5; --dim:#6aabbc; --faint:#2e6878;
+  --border:rgba(255,106,0,0.14); --border-dim:rgba(255,106,0,0.07);
+  --glow-c:rgba(0,229,255,0.55); --glow-o:rgba(255,106,0,0.5);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;min-height:100vh;padding:36px 48px 64px;}
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(255,106,0,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,106,0,0.022) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+body::after{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
+}
+.wrap{position:relative;z-index:1;max-width:900px;margin:0 auto;animation:rise 0.4s ease both;}
+
+/* ── BREADCRUMB ── */
+.breadcrumb{display:flex;align-items:center;gap:10px;margin-bottom:28px;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.3em;color:var(--faint);}
+.breadcrumb a{color:var(--dim);text-decoration:none;transition:color 0.2s;}
+.breadcrumb a:hover{color:var(--orange);}
+.breadcrumb .cur{color:var(--orange);}
+
+/* ── MASTHEAD ── */
+.masthead{display:flex;flex-direction:column;gap:8px;border-bottom:1px solid rgba(255,106,0,0.2);padding-bottom:22px;margin-bottom:30px;}
+.logo{font-family:'Orbitron',monospace;font-weight:900;font-size:2.4rem;letter-spacing:0.35em;color:#fff;
+  text-shadow:0 0 8px #fff,0 0 22px var(--cyan),0 0 55px rgba(0,229,255,0.4);line-height:1;}
+.logo .dot{color:var(--orange);text-shadow:0 0 14px var(--glow-o);font-size:0.55em;padding:0 0.04em;}
+.page-title{font-family:'Orbitron',monospace;font-weight:700;font-size:1.4rem;letter-spacing:0.28em;color:var(--orange);text-shadow:0 0 16px var(--orange);}
+.mast-sub{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.28em;color:var(--faint);}
+
+/* ── SECTION ── */
+.sec-hdr{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.sec-line{flex:1;height:1px;background:linear-gradient(to right,rgba(255,106,0,0.2) 0%,transparent 100%);}
+.sec-label{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:0.4em;color:var(--orange);opacity:0.85;white-space:nowrap;}
+.section{margin-bottom:36px;}
+
+/* ── STAT CHIPS ── */
+.stat-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:32px;}
+.stat-chip{border:1px solid rgba(255,106,0,0.2);background:var(--bg-card);padding:12px 18px;
+  display:flex;flex-direction:column;gap:4px;flex:1;min-width:100px;transition:border-color 0.2s;}
+.stat-chip:hover{border-color:rgba(255,106,0,0.5);}
+.stat-val{font-family:'Orbitron',monospace;font-weight:700;font-size:18px;letter-spacing:0.05em;color:var(--orange);text-shadow:0 0 10px var(--orange);}
+.stat-lbl{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.25em;color:var(--dim);}
+
+/* ── PROSE ── */
+.prose{font-family:'Exo 2',sans-serif;font-weight:300;font-size:14px;line-height:1.85;color:var(--dim);}
+.prose p+p{margin-top:12px;}
+.prose strong{color:var(--text);font-weight:600;}
+.prose .hl{color:var(--cyan);}
+.prose .og{color:var(--orange);}
+
+/* ── MASS POINT CARDS ── */
+.mp-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:20px;}
+.mp-card{
+  border:1px solid rgba(255,106,0,0.2);background:var(--bg-card);
+  padding:18px 14px;display:flex;flex-direction:column;gap:7px;
+  position:relative;overflow:hidden;transition:border-color 0.2s,box-shadow 0.2s;
+}
+.mp-card:hover{border-color:var(--orange);box-shadow:0 0 18px rgba(255,106,0,0.1);}
+.mp-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(to right,transparent,var(--orange),transparent);opacity:0.45;}
+.mp-mass{font-family:'Orbitron',monospace;font-weight:900;font-size:1.8rem;color:var(--orange);letter-spacing:0.1em;text-shadow:0 0 12px rgba(255,106,0,0.5);line-height:1;}
+.mp-unit{font-family:'Share Tech Mono',monospace;font-size:10px;color:var(--faint);letter-spacing:0.2em;}
+.mp-files{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.07em;color:var(--dim);line-height:1.75;border-top:1px solid rgba(255,106,0,0.1);padding-top:8px;margin-top:2px;}
+.mp-files .f{color:var(--orange);opacity:0.7;}
+
+/* ── TAG ROW ── */
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.tag{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.14em;
+  color:var(--orange);border:1px solid rgba(255,106,0,0.25);padding:4px 10px;opacity:0.7;transition:opacity 0.2s,border-color 0.2s;}
+.tag:hover{opacity:1;border-color:var(--orange);}
+
+/* ── PIPELINE ── */
+.pipeline{display:flex;flex-direction:column;gap:0;margin-bottom:8px;position:relative;}
+.pipeline::before{content:'';position:absolute;left:23px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,transparent,rgba(255,106,0,0.3) 10%,rgba(255,106,0,0.3) 90%,transparent);}
+.pipe-step{display:grid;grid-template-columns:48px 1fr;gap:0 16px;padding:0 0 20px;}
+.pipe-num{
+  width:48px;height:48px;border:1px solid rgba(255,106,0,0.4);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Orbitron',monospace;font-weight:700;font-size:13px;color:var(--orange);
+  background:var(--bg);position:relative;z-index:1;box-shadow:0 0 10px rgba(255,106,0,0.12);
+}
+.pipe-content{padding-top:10px;}
+.pipe-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;letter-spacing:0.25em;color:var(--orange);margin-bottom:6px;}
+.pipe-desc{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.07em;color:var(--dim);line-height:1.7;}
+.pipe-desc .hl{color:var(--cyan);}
+.pipe-desc .og{color:var(--orange);}
+
+/* ── MODEL CARDS ── */
+.model-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px;}
+.model-card{border:1px solid rgba(255,106,0,0.15);background:var(--bg-card);padding:16px 18px;display:flex;flex-direction:column;gap:7px;transition:border-color 0.2s;}
+.model-card:hover{border-color:rgba(255,106,0,0.35);}
+.model-lbl{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;letter-spacing:0.28em;color:var(--orange);opacity:0.8;}
+.model-name{font-family:'Exo 2',sans-serif;font-weight:600;font-size:13.5px;color:var(--text);}
+.model-detail{font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:0.07em;color:var(--dim);line-height:1.65;}
+.model-status{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:0.2em;padding:3px 8px;display:inline-flex;border:1px solid;width:fit-content;margin-top:2px;}
+.model-status.done   {color:var(--green); border-color:rgba(0,255,65,0.35);}
+.model-status.active {color:var(--orange);border-color:rgba(255,106,0,0.4);}
+.model-status.planned{color:var(--faint); border-color:rgba(46,104,120,0.4);}
+
+/* ── COLLABS ── */
+.collab-list{display:flex;flex-direction:column;gap:8px;}
+.collab-row{
+  display:grid;grid-template-columns:170px 110px 1fr;gap:0 14px;padding:11px 14px;
+  border:1px solid rgba(255,106,0,0.12);background:var(--bg-card);
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.08em;
+  transition:border-color 0.2s;
+}
+.collab-row:hover{border-color:rgba(255,106,0,0.3);}
+.c-name{color:var(--text);}
+.c-role{color:var(--orange);opacity:0.8;}
+.c-inst{color:var(--dim);}
+
+/* ── FOOTER ── */
+.page-footer{margin-top:48px;padding-top:16px;border-top:1px solid rgba(255,106,0,0.12);
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.footer-sig{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:0.2em;color:var(--faint);}
+.footer-sig span{color:var(--orange);opacity:0.6;}
+.page-back{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:0.2em;
+  color:var(--dim);text-decoration:none;border:1px solid rgba(255,106,0,0.2);padding:8px 16px;
+  transition:color 0.2s,border-color 0.2s,background 0.2s;
+}
+.page-back:hover{color:var(--orange);border-color:var(--orange);background:rgba(255,106,0,0.05);}
+
+@keyframes rise{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#7a3300;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="breadcrumb">
+    <a href="about.html">ABOUT</a>
+    <span>&nbsp;/&nbsp;</span>
+    <span class="cur">PROJECT</span>
+  </div>
+
+  <div class="masthead">
+    <div class="logo">H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X</div>
+    <div class="page-title">PROJECT</div>
+    <div class="mast-sub">ATLAS RUN 3 · LLP/HSS SEARCH · UA HEP GROUP · N. HERLING</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-chip"><div class="stat-val">Run 3</div><div class="stat-lbl">LHC CAMPAIGN</div></div>
+    <div class="stat-chip"><div class="stat-val">4</div><div class="stat-lbl">MASS POINTS</div></div>
+    <div class="stat-chip"><div class="stat-val">MSVtx</div><div class="stat-lbl">VERTEX TYPE</div></div>
+    <div class="stat-chip"><div class="stat-val">MK3→4</div><div class="stat-lbl">MODEL GEN</div></div>
+    <div class="stat-chip"><div class="stat-val">UA</div><div class="stat-lbl">INSTITUTION</div></div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">PHYSICS CONTEXT</span><div class="sec-line"></div></div>
+    <div class="prose">
+      <p>The Standard Model does not account for dark matter. The <strong>Hidden Sector Scalar (HSS)</strong> extension introduces light neutral scalars S that mix with the Higgs and decay with macroscopic decay lengths — called <span class="og">Long-Lived Particles (LLPs)</span>.</p>
+      <p>At ATLAS, LLPs produced in <span class="hl">pp collisions at √s = 13.6 TeV</span> can travel meters before decaying, leaving displaced tracks inside the Muon Spectrometer. The <span class="og">MSVtx signature</span> — a cluster of MS tracks converging at a displaced point — is the experimental handle. This search targets H → SS → bbbb with S masses in the <span class="hl">5–55 GeV range</span>.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">SIGNAL MASS POINTS</span><div class="sec-line"></div></div>
+    <div class="mp-grid">
+      <div class="mp-card">
+        <div class="mp-mass">mS5</div><div class="mp-unit">5 GeV</div>
+        <div class="mp-files"><span class="f">nn1</span>_barrel.csv<br><span class="f">nn1</span>_endcap.csv<br><span class="f">nn2</span>_barrel.csv<br><span class="f">nn2</span>_endcap.csv</div>
+      </div>
+      <div class="mp-card">
+        <div class="mp-mass">mS16</div><div class="mp-unit">16 GeV</div>
+        <div class="mp-files"><span class="f">nn1</span>_barrel.csv<br><span class="f">nn1</span>_endcap.csv<br><span class="f">nn2</span>_barrel.csv<br><span class="f">nn2</span>_endcap.csv</div>
+      </div>
+      <div class="mp-card">
+        <div class="mp-mass">mS35</div><div class="mp-unit">35 GeV</div>
+        <div class="mp-files"><span class="f">nn1</span>_barrel.csv<br><span class="f">nn1</span>_endcap.csv<br><span class="f">nn2</span>_barrel.csv<br><span class="f">nn2</span>_endcap.csv</div>
+      </div>
+      <div class="mp-card">
+        <div class="mp-mass">mS55</div><div class="mp-unit">55 GeV</div>
+        <div class="mp-files"><span class="f">nn1</span>_barrel.csv<br><span class="f">nn1</span>_endcap.csv<br><span class="f">nn2</span>_barrel.csv<br><span class="f">nn2</span>_endcap.csv</div>
+      </div>
+    </div>
+    <div class="tag-row">
+      <span class="tag">BKG: data24VR</span>
+      <span class="tag">BKG: PunchThrough MC</span>
+      <span class="tag">Snapshot after df11</span>
+      <span class="tag">HTmiss &gt; 40 GeV</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">ANALYSIS PIPELINE</span><div class="sec-line"></div></div>
+    <div class="pipeline">
+      <div class="pipe-step">
+        <div class="pipe-num">01</div>
+        <div class="pipe-content">
+          <div class="pipe-title">NTUPLE INGESTION</div>
+          <div class="pipe-desc">Run 3 MC ntuples on <span class="hl">atlng01.physics.arizona.edu</span>. AnalysisBase 25.2.81. Signal MC (4 mass points) + data24VR + PunchThrough backgrounds.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">02</div>
+        <div class="pipe-content">
+          <div class="pipe-title">CUTFLOW — CutflowRunner.cxx</div>
+          <div class="pipe-desc">Sequential MSVtx selection via RDataFrame. Key cuts: MSVtx multiplicity, HTmiss &gt; <span class="og">40 GeV</span> (MeV units in ntuples), segment counts, quality flags. df11 = final stage.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">03</div>
+        <div class="pipe-content">
+          <div class="pipe-title">SNAPSHOT → CSV</div>
+          <div class="pipe-desc">ROOT Snapshot after df11: 4 flat files per mass point (nn1/nn2 × barrel/endcap). <span class="hl">convert_snapshots_to_csv.py</span> via PyROOT → pandas CSVs. mcChannelNumber skipped for data.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">04</div>
+        <div class="pipe-content">
+          <div class="pipe-title">MK3 FOCUSED MLP TRAINING</div>
+          <div class="pipe-desc">Four MLPs (128→128→1, sigmoid). k-fold CV for data sensitivity. Bayesian HMC for parameter uncertainty. RRM penalty: <span class="hl">[1−AUC, fold_variance, σ_HMC]</span>.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">05</div>
+        <div class="pipe-content">
+          <div class="pipe-title">INFERENCE → P(signal)</div>
+          <div class="pipe-desc">Trained mk3 models produce <span class="og">P(signal)</span> score distributions on held-out test sets and background CSVs. ABCD plane closure check as 4th RRM component pending.</div>
+        </div>
+      </div>
+      <div class="pipe-step">
+        <div class="pipe-num">06</div>
+        <div class="pipe-content">
+          <div class="pipe-title">MK4 SSL TARGET — HELIX Framework</div>
+          <div class="pipe-desc">Self-supervised contrastive learning over cutflow sequences. Tokenization strategies: <span class="hl">S1</span> object-level, <span class="hl">S2</span> track-level, <span class="hl">S3</span> cutflow-stage. InfoNCE with τ = 1/ΔS.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">HELIX ML MODELS</span><div class="sec-line"></div></div>
+    <div class="model-grid">
+      <div class="model-card">
+        <div class="model-lbl">MK3 · BASELINE</div>
+        <div class="model-name">Focused MLP — nn1 Barrel</div>
+        <div class="model-detail">128→128→1 · sigmoid · BCELoss<br>k-fold CV · Bayesian HMC</div>
+        <div class="model-status done">COMPLETE</div>
+      </div>
+      <div class="model-card">
+        <div class="model-lbl">MK3 · BASELINE</div>
+        <div class="model-name">Focused MLP — nn1 Endcap</div>
+        <div class="model-detail">128→128→1 · sigmoid · BCELoss<br>k-fold CV · Bayesian HMC</div>
+        <div class="model-status done">COMPLETE</div>
+      </div>
+      <div class="model-card">
+        <div class="model-lbl">MK3 · BASELINE</div>
+        <div class="model-name">Focused MLP — nn2 Barrel</div>
+        <div class="model-detail">128→128→1 · sigmoid · BCELoss<br>k-fold CV · Bayesian HMC</div>
+        <div class="model-status done">COMPLETE</div>
+      </div>
+      <div class="model-card">
+        <div class="model-lbl">MK3 · BASELINE</div>
+        <div class="model-name">Focused MLP — nn2 Endcap</div>
+        <div class="model-detail">128→128→1 · sigmoid · BCELoss<br>k-fold CV · Bayesian HMC</div>
+        <div class="model-status done">COMPLETE</div>
+      </div>
+      <div class="model-card">
+        <div class="model-lbl">MK4 · SSL TARGET</div>
+        <div class="model-name">HELIX Contrastive — S1 Object</div>
+        <div class="model-detail">InfoNCE · τ = 1/ΔS (MaxEnt)<br>Object-level tokenization</div>
+        <div class="model-status active">IN DEVELOPMENT</div>
+      </div>
+      <div class="model-card">
+        <div class="model-lbl">MK4 · SSL TARGET</div>
+        <div class="model-name">CutFormer — S3 Cutflow</div>
+        <div class="model-detail">Transformer over cutflow sequence<br>S3 stage-level tokenization</div>
+        <div class="model-status planned">PLANNED</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-label">TEAM &amp; COLLABORATORS</span><div class="sec-line"></div></div>
+    <div class="collab-list">
+      <div class="collab-row"><span class="c-name">Prof. K. Johns</span><span class="c-role">ADVISOR</span><span class="c-inst">University of Arizona · UA ATLAS HEP Group</span></div>
+      <div class="collab-row"><span class="c-name">Prof. E. Cheu</span><span class="c-role">COLLABORATOR</span><span class="c-inst">University of Arizona · SRTM / WinCC OA DCS</span></div>
+      <div class="collab-row"><span class="c-name">Julian</span><span class="c-role">CUTFLOW REPO</span><span class="c-inst">MSVtx CutflowRunner.cxx — primary cutflow codebase</span></div>
+      <div class="collab-row"><span class="c-name">Diptiman</span><span class="c-role">BASELINE ML</span><span class="c-inst">nn_train.ipynb · baseline MLP · GAT/GCN exploration</span></div>
+      <div class="collab-row"><span class="c-name">N. Herling</span><span class="c-role">RA / DEVELOPER</span><span class="c-inst">HELIX framework · cutflow pipeline · MSDS / UA</span></div>
+    </div>
+  </div>
+
+  <div class="page-footer">
+    <a class="page-back" href="about.html">← BACK TO ABOUT</a>
+    <div class="footer-sig">H·E·L·I·X · <span>PROJECT</span> · N. HERLING</div>
+  </div>
+
+</div>
+</body>
+</html>

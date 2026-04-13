@@ -20,10 +20,26 @@ try:
 except ImportError:
     HAS_PTY = False
 
-ROOT       = Path(__file__).parent
+SCRIPT_DIR = Path(__file__).parent          # …/assets/py_progs
+ROOT       = SCRIPT_DIR.parent.parent       # …/_HELIX_
 DATA_FILE  = ROOT / "data" / "helix_data.json"
 PREFS_FILE = ROOT / "data" / "user_prefs.json"
 DOCS_DIR   = ROOT / "docs"
+
+# Write PID file so kill_helix.bat and the launcher can kill us precisely
+_PID_FILE = ROOT / "data" / "server.pid"
+try:
+    _PID_FILE.parent.mkdir(parents=True, exist_ok=True)
+    _PID_FILE.write_text(str(os.getpid()))
+    print(f"[HELIX] server PID={os.getpid()}")
+except Exception as _e:
+    print(f"[HELIX] PID file warning: {_e}")
+
+import atexit as _atexit
+@_atexit.register
+def _cleanup_pid():
+    try: _PID_FILE.unlink(missing_ok=True)
+    except Exception: pass
 
 app = Flask(__name__, static_folder=str(ROOT))
 CORS(app)

@@ -1,0 +1,255 @@
+/* ════════════════════════════════════════════
+   HELIX — ABOUT SUB-PAGES SHARED STYLESHEET
+   about.css · TRON Ares design system
+════════════════════════════════════════════ */
+
+/* ── TOKENS ── */
+:root {
+  --cyan:         #00e5ff;
+  --cyan-mid:     #00b3cc;
+  --cyan-dim:     #007a8c;
+  --cyan-ghost:   rgba(0,229,255,0.06);
+  --orange:       #ff6a00;
+  --orange-dim:   #7a3300;
+  --orange-ghost: rgba(255,106,0,0.06);
+  --green:        #00ff41;
+  --green-dim:    #009929;
+  --purple:       #b044ff;
+  --bg:           #020c14;
+  --bg-card:      rgba(6,15,26,0.92);
+  --text:         #c8eef5;
+  --text-dim:     #6aabbc;
+  --text-faint:   #2e6878;
+  --glow-c:       rgba(0,229,255,0.55);
+  --glow-o:       rgba(255,106,0,0.5);
+  --glow-g:       rgba(0,255,65,0.6);
+  --border:       rgba(0,229,255,0.14);
+  --border-dim:   rgba(0,229,255,0.07);
+}
+
+/* ── RESET ── */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+/* ── BASE ── */
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Exo 2', sans-serif;
+  min-height: 100vh;
+  padding: 36px 48px 64px;
+  overflow-x: hidden;
+}
+
+/* grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.026) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,229,255,0.026) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* scanlines */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.04) 3px, rgba(0,0,0,0.04) 4px
+  );
+}
+
+.wrap {
+  position: relative; z-index: 1;
+  max-width: 900px; margin: 0 auto;
+  animation: page-rise 0.4s ease both;
+}
+
+/* ── BREADCRUMB / BACK ── */
+.breadcrumb {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 28px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.3em; color: var(--text-faint);
+}
+.breadcrumb a {
+  color: var(--text-dim); text-decoration: none;
+  transition: color 0.2s;
+}
+.breadcrumb a:hover { color: var(--cyan); }
+.breadcrumb .sep { opacity: 0.4; }
+.breadcrumb .cur { color: var(--cyan); }
+
+/* ── MASTHEAD ── */
+.masthead {
+  display: flex; flex-direction: column; gap: 8px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px; margin-bottom: 32px;
+}
+.mast-logo {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: 3rem; letter-spacing: 0.35em;
+  color: #fff;
+  text-shadow:
+    0 0 8px #fff,
+    0 0 22px var(--cyan),
+    0 0 55px rgba(0,229,255,0.4),
+    0 0 90px rgba(0,229,255,0.18);
+  line-height: 1;
+}
+.mast-logo .dot {
+  color: var(--orange);
+  text-shadow: 0 0 14px var(--glow-o), 0 0 30px rgba(255,106,0,0.35);
+  font-size: 0.55em; padding: 0 0.04em;
+}
+.mast-page-title {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 1.5rem; letter-spacing: 0.28em;
+  color: var(--page-accent, var(--cyan));
+  text-shadow: 0 0 16px var(--page-accent, var(--cyan));
+  margin-top: 4px;
+}
+.mast-tagline {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.38em; color: var(--text-dim);
+  text-transform: uppercase;
+}
+.mast-ver {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.22em; color: var(--text-faint);
+}
+
+/* ── SECTION HEADER ── */
+.sec-hdr {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 16px;
+}
+.sec-hdr-line {
+  flex: 1; height: 1px;
+  background: linear-gradient(to right, var(--border) 0%, transparent 100%);
+}
+.sec-hdr-label {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 10px; letter-spacing: 0.4em;
+  color: var(--page-accent, var(--cyan));
+  text-shadow: 0 0 10px var(--page-accent, var(--cyan));
+  white-space: nowrap; opacity: 0.85;
+}
+
+/* ── PROSE ── */
+.prose {
+  font-family: 'Exo 2', sans-serif; font-weight: 300;
+  font-size: 14.5px; line-height: 1.85; color: var(--text-dim);
+}
+.prose p + p { margin-top: 12px; }
+.prose strong { color: var(--text); font-weight: 600; }
+.prose .hl   { color: var(--page-accent, var(--cyan)); }
+.prose .hl-o { color: var(--orange); }
+.prose .hl-g { color: var(--green); }
+.prose .hl-p { color: var(--purple); }
+
+/* ── SECTION BLOCK ── */
+.section { margin-bottom: 36px; }
+
+/* ── TAG CHIPS ── */
+.tag-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tag {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.18em;
+  color: var(--page-accent, var(--cyan));
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  opacity: 0.7;
+  transition: opacity 0.2s, border-color 0.2s;
+}
+.tag:hover { opacity: 1; border-color: var(--page-accent, var(--cyan)); }
+
+/* ── DATA TABLE ── */
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-family: 'Share Tech Mono', monospace; font-size: 12px;
+}
+.data-table th {
+  text-align: left; padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--page-accent, var(--cyan));
+  letter-spacing: 0.22em; font-size: 10px;
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  opacity: 0.8;
+}
+.data-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border-dim);
+  color: var(--text-dim); letter-spacing: 0.08em;
+  vertical-align: top;
+}
+.data-table tr:hover td { color: var(--text); background: rgba(0,229,255,0.02); }
+.data-table td:first-child { color: var(--text); white-space: nowrap; }
+
+/* ── STAT CHIPS ── */
+.stat-row {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 32px;
+}
+.stat-chip {
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  padding: 12px 18px;
+  display: flex; flex-direction: column; gap: 4px;
+  flex: 1; min-width: 110px;
+  transition: border-color 0.2s;
+}
+.stat-chip:hover { border-color: var(--page-accent, var(--cyan-dim)); }
+.stat-val {
+  font-family: 'Orbitron', monospace; font-weight: 700;
+  font-size: 20px; letter-spacing: 0.05em;
+  color: var(--page-accent, var(--cyan));
+  text-shadow: 0 0 10px var(--page-accent, var(--cyan));
+}
+.stat-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.25em; color: var(--text-dim);
+}
+
+/* ── FOOTER ── */
+.page-footer {
+  margin-top: 48px; padding-top: 18px;
+  border-top: 1px solid var(--border-dim);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 10px;
+}
+.footer-sig {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.22em; color: var(--text-faint);
+}
+.footer-sig span { color: var(--cyan-dim); }
+
+.page-back {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.22em;
+  color: var(--text-dim); text-decoration: none;
+  border: 1px solid var(--border);
+  padding: 8px 16px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.page-back:hover {
+  color: var(--page-accent, var(--cyan));
+  border-color: var(--page-accent, var(--cyan));
+  background: var(--cyan-ghost);
+  box-shadow: 0 0 12px rgba(0,229,255,0.15);
+}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--cyan-dim); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--cyan-mid); }
+
+/* ── ANIMATIONS ── */
+@keyframes page-rise {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+@keyframes blink { 50% { opacity:0.15; } }

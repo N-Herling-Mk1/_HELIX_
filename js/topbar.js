@@ -25,7 +25,11 @@
     document.getElementById('viewer-panel')
   ];
   /* Tabs to disable */
-  const subtabs = document.querySelectorAll('.subtab');
+  const subtabs     = document.querySelectorAll('.subtab');
+  /* Sector rail buttons to disable */
+  const sectorBtns  = document.querySelectorAll('.sector-btn');
+  /* Nav buttons (ABOUT / BLOG) to disable */
+  const navBtns     = document.querySelectorAll('.navbtn');
 
   const ep1 = document.getElementById('energy-panel-1');
   const ep2 = document.getElementById('energy-panel-2');
@@ -47,6 +51,22 @@
       btn.disabled = energyActive;
       btn.style.opacity = energyActive ? '0.35' : '';
       btn.style.cursor  = energyActive ? 'not-allowed' : '';
+    });
+
+    /* disable/enable H-E-L-I-X sector rail buttons */
+    sectorBtns.forEach(btn => {
+      btn.disabled = energyActive;
+      btn.style.opacity      = energyActive ? '0.35' : '';
+      btn.style.cursor       = energyActive ? 'not-allowed' : '';
+      btn.style.pointerEvents = energyActive ? 'none' : '';
+    });
+
+    /* disable/enable ABOUT / BLOG nav buttons */
+    navBtns.forEach(btn => {
+      btn.disabled = energyActive;
+      btn.style.opacity      = energyActive ? '0.35' : '';
+      btn.style.cursor       = energyActive ? 'not-allowed' : '';
+      btn.style.pointerEvents = energyActive ? 'none' : '';
     });
   }
 

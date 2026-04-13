@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BLOG — H.E.L.I.X</title>
+<link rel="icon" type="image/x-icon" href="assets/img/helix_64.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@200;300;400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --orange:      #ff6a00;
+  --orange-dim:  #7a3300;
+  --orange-ghost:rgba(255,106,0,0.06);
+  --cyan:        #00e5ff;
+  --bg:          #000000;
+  --text:        #c8eef5;
+  --text-dim:    #6aabbc;
+  --text-faint:  #2e6878;
+  --glow-o:      rgba(255,106,0,0.55);
+  --border:      rgba(255,106,0,0.14);
+  --border-dim:  rgba(255,106,0,0.07);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  height: 100%; width: 100%;
+  background: var(--bg);
+  font-family: 'Exo 2', sans-serif;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* grid bg */
+body::before {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image:
+    linear-gradient(rgba(255,106,0,0.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,106,0,0.018) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+/* scanlines */
+body::after {
+  content: '';
+  position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 3px,
+    rgba(0,0,0,0.07) 3px, rgba(0,0,0,0.07) 4px
+  );
+}
+
+.scene {
+  position: relative; z-index: 1;
+  height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 0;
+  padding: 40px;
+}
+
+/* ── HELIX LOGO ROW ── */
+.logo-row {
+  display: flex; align-items: center; gap: 24px;
+  margin-bottom: 36px;
+  animation: fade-up 0.5s 0s ease both;
+}
+
+/* ── HELIX LOGO ── */
+.helix-logo {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(2.8rem, 7vw, 5rem);
+  letter-spacing: 0.38em; line-height: 1;
+  color: #fff;
+  text-shadow:
+    0 0 6px #fff,
+    0 0 18px #fff,
+    0 0 40px rgba(255,255,255,0.7),
+    0 0 80px rgba(0,229,255,0.35),
+    0 0 140px rgba(0,229,255,0.15);
+  display: flex; align-items: center;
+}
+.helix-logo .dot {
+  color: var(--orange);
+  text-shadow:
+    0 0 6px var(--orange),
+    0 0 16px rgba(255,106,0,0.8),
+    0 0 32px rgba(255,106,0,0.4);
+  font-size: 0.45em;
+  padding: 0 0.08em;
+  position: relative; top: -0.05em;
+}
+
+/* ── SOC MEDIA TAG ── */
+.soc-tag {
+  height: clamp(150px, 20vw, 250px);
+  width: auto;
+  display: block;
+  mix-blend-mode: screen;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+.corner { position: fixed; width: 44px; height: 44px; z-index: 20; pointer-events: none; }
+.corner::before, .corner::after {
+  content: ''; position: absolute;
+  background: var(--orange);
+  box-shadow: 0 0 7px var(--glow-o);
+}
+.corner::before { width: 2px; height: 100%; top: 0; left: 0; }
+.corner::after  { width: 100%; height: 2px; top: 0; left: 0; }
+.corner.tl { top: 24px; left: 24px; }
+.corner.tr { top: 24px; right: 24px; transform: scaleX(-1); }
+.corner.bl { bottom: 24px; left: 24px; transform: scaleY(-1); }
+.corner.br { bottom: 24px; right: 24px; transform: scale(-1,-1); }
+
+/* sector badge */
+.sector-badge {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 10px; letter-spacing: 0.45em; color: var(--orange);
+  text-shadow: 0 0 8px var(--glow-o);
+  opacity: 0.7; margin-bottom: 20px;
+  animation: fade-up 0.6s ease both;
+}
+
+/* logo */
+.cs-logo {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(2.4rem, 6vw, 4.5rem);
+  letter-spacing: 0.18em;
+  color: var(--orange);
+  text-shadow:
+    0 0 8px rgba(255,106,0,0.8),
+    0 0 28px rgba(255,106,0,0.5),
+    0 0 70px rgba(255,106,0,0.25);
+  line-height: 1; text-align: center;
+  animation: fade-up 0.6s 0.1s ease both;
+}
+
+/* divider */
+.cs-rule {
+  width: 200px; height: 1px; margin: 22px 0;
+  background: linear-gradient(to right,
+    transparent, var(--orange) 30%, var(--orange) 70%, transparent);
+  opacity: 0.4;
+  animation: fade-up 0.5s 0.2s ease both;
+}
+
+/* status line */
+.cs-status {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 13px; letter-spacing: 0.35em; color: var(--orange);
+  opacity: 0.75; margin-bottom: 10px;
+  animation: fade-up 0.5s 0.25s ease both;
+}
+
+/* coming soon text */
+.cs-headline {
+  font-family: 'Orbitron', monospace; font-weight: 900;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  letter-spacing: 0.5em;
+  color: #fff;
+  text-shadow: 0 0 18px rgba(255,255,255,0.35);
+  text-align: center; line-height: 1.4;
+  animation: fade-up 0.5s 0.3s ease both;
+}
+
+/* sub */
+.cs-sub {
+  font-family: 'Exo 2', sans-serif; font-weight: 300;
+  font-size: 14px; letter-spacing: 0.1em; color: var(--text-dim);
+  text-align: center; margin-top: 18px; max-width: 440px; line-height: 1.7;
+  animation: fade-up 0.5s 0.38s ease both;
+}
+
+/* blink cursor */
+.cs-cursor {
+  display: inline-block; width: 10px; height: 1.1em;
+  background: var(--orange); margin-left: 6px;
+  vertical-align: text-bottom;
+  animation: blink-cur 1s step-start infinite;
+}
+
+/* progress bar */
+.cs-progress-wrap {
+  margin-top: 36px; width: 280px;
+  animation: fade-up 0.5s 0.45s ease both;
+}
+.cs-progress-label {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.3em; color: var(--text-faint);
+  display: flex; justify-content: space-between; margin-bottom: 6px;
+}
+.cs-progress-track {
+  width: 100%; height: 3px;
+  background: rgba(255,106,0,0.12);
+  border: 1px solid rgba(255,106,0,0.2);
+  position: relative; overflow: hidden;
+}
+.cs-progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(to right, var(--orange-dim), var(--orange));
+  box-shadow: 0 0 8px var(--glow-o);
+  animation: progress-load 3.5s 0.9s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+/* scanline sweep on bar */
+.cs-progress-track::after {
+  content: '';
+  position: absolute; top: 0; left: -40%; width: 40%; height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255,106,0,0.6), transparent);
+  animation: scan-bar 2.5s 1.5s ease-in-out infinite;
+}
+
+/* back link */
+.cs-back {
+  margin-top: 32px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 11px; letter-spacing: 0.25em;
+  color: var(--text-faint); text-decoration: none;
+  border: 1px solid rgba(255,106,0,0.2);
+  padding: 8px 20px;
+  transition: color 0.2s, border-color 0.2s, background 0.2s, box-shadow 0.2s;
+  animation: fade-up 0.5s 0.55s ease both;
+  display: inline-block;
+}
+.cs-back:hover {
+  color: var(--orange);
+  border-color: var(--orange);
+  background: rgba(255,106,0,0.06);
+  box-shadow: 0 0 14px rgba(255,106,0,0.2);
+}
+
+/* footer timestamp */
+.cs-footer {
+  position: fixed; bottom: 28px;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 9px; letter-spacing: 0.3em; color: var(--text-faint);
+  z-index: 10;
+}
+
+/* animations */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes blink-cur {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes progress-load {
+  0%   { width: 0%; }
+  60%  { width: 72%; }
+  80%  { width: 79%; }
+  100% { width: 83%; }
+}
+@keyframes scan-bar {
+  0%   { left: -40%; }
+  100% { left: 140%; }
+}
+</style>
+</head>
+<body>
+
+<div class="corner tl"></div>
+<div class="corner tr"></div>
+<div class="corner bl"></div>
+<div class="corner br"></div>
+
+<div class="scene">
+  <img class="soc-tag" src="assets/img/Soc_media_tag.png" alt="HELIX">
+
+  <div class="logo-row">
+    <div class="helix-logo">
+      H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X
+    </div>
+  </div>
+
+  <div class="sector-badge">H · E · L · I · X &nbsp;// &nbsp;BLOG MODULE</div>
+
+  <div class="cs-logo">BLOG</div>
+  <div class="cs-rule"></div>
+  <div class="cs-status">STATUS : INITIALISING</div>
+  <div class="cs-headline">COMING&nbsp;SOON<span class="cs-cursor"></span></div>
+
+  <div class="cs-sub">
+    The HELIX blog is under construction. It will host long-form posts on
+    physics, machine learning research, mathematics, and the occasional
+    field note from active experiments.
+  </div>
+
+  <div class="cs-progress-wrap">
+    <div class="cs-progress-label">
+      <span>CONSTRUCTION PROGRESS</span>
+      <span id="pct">0%</span>
+    </div>
+    <div class="cs-progress-track">
+      <div class="cs-progress-fill" id="progress-fill"></div>
+    </div>
+  </div>
+
+  <a class="cs-back" href="main.html">← RETURN TO HUB</a>
+</div>
+
+<div class="cs-footer" id="cs-footer"></div>
+
+<script>
+  /* live clock in footer */
+  (function tick() {
+    const el = document.getElementById('cs-footer');
+    if (!el) return;
+    const now = new Date();
+    const pad = n => String(n).padStart(2,'0');
+    el.textContent =
+      pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds()) +
+      '  //  HELIX BLOG  //  OFFLINE';
+    setTimeout(tick, 1000);
+  })();
+
+  /* animate the % label alongside the CSS progress bar */
+  (function animatePct() {
+    const pctEl = document.getElementById('pct');
+    const fill  = document.getElementById('progress-fill');
+    if (!pctEl || !fill) return;
+    const target = 83;
+    let cur = 0;
+    const start = performance.now() + 900;   /* match animation delay */
+    const dur   = 3500;
+
+    function step(ts) {
+      const elapsed = Math.max(0, ts - start);
+      const t = Math.min(elapsed / dur, 1);
+      const ease = t < 0.6
+        ? (t / 0.6) * 0.72
+        : 0.72 + ((t - 0.6) / 0.4) * (target / 100 - 0.72);
+      cur = Math.round(ease * 100);
+      pctEl.textContent = cur + '%';
+      if (t < 1) requestAnimationFrame(step);
+      else pctEl.textContent = target + '%';
+    }
+    requestAnimationFrame(step);
+  })();
+</script>
+</body>
+</html>

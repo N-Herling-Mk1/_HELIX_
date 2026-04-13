@@ -20,9 +20,12 @@
   const emptyMsg2     = document.getElementById("empty-msg-2");
   const contentLetter = document.getElementById("content-sector-letter");
   const contentName   = document.getElementById("content-sector-name");
+  const navAbout      = document.getElementById("navbtn-about");
+  const navBlog       = document.getElementById("navbtn-blog");
 
   let activeSector = null;
   let activeTab    = null;
+  let pageMode     = false;   // true when viewer is showing a static page (about/etc)
 
   /* ── EMPTY STATE SWITCHING ── */
   function showEmptyState(state) {
@@ -180,17 +183,50 @@
     hide(viewerPanel);
     if (viewerFrame) viewerFrame.src = "";
     if (viewerGrain) viewerGrain.classList.remove("active");
-    show(articleList);
+    if (viewerDl)    viewerDl.style.display = "";   // restore download button
+    if (navAbout)    navAbout.classList.remove("active");
+    pageMode = false;
+    // restore correct content area
+    if (activeSector) {
+      show(articleList);
+    } else {
+      showEmptyState(1);
+    }
+  }
+
+  /* ── PAGE NAVIGATION ── */
+  function openAbout() {
+    pageMode = true;
+    subtabs.forEach(t => t.classList.remove("active"));
+    if (navAbout) navAbout.classList.add("active");
+    hide(panelEmpty);
+    hide(articleList);
+    show(viewerPanel);
+    if (viewerTitle) viewerTitle.textContent = "ABOUT — H·E·L·I·X";
+    if (viewerDl)    viewerDl.style.display = "none";
+    if (viewerGrain) viewerGrain.classList.remove("active");
+    if (viewerBack)  { viewerBack.style.color = ""; viewerBack.style.borderColor = ""; }
+    if (viewerFrame) viewerFrame.src = "about.html";
+  }
+
+  function openBlog() {
+    window.open("blog.html", "_blank");
   }
 
   /* ── EVENTS ── */
   if (viewerBack) {
     viewerBack.addEventListener("click", () => {
       closeViewer();
-      const s = HELIX_SECTORS.find(x => x.letter === activeSector);
-      if (s) renderContent(s, activeTab);
+      if (!pageMode && activeSector) {
+        const s = HELIX_SECTORS.find(x => x.letter === activeSector);
+        if (s) renderContent(s, activeTab);
+      }
     });
   }
+
+  /* ── NAV BUTTON EVENTS ── */
+  if (navAbout) navAbout.addEventListener("click", openAbout);
+  if (navBlog)  navBlog.addEventListener("click",  openBlog);
 
   sectorBtns.forEach(btn => {
     btn.addEventListener("click", () => {

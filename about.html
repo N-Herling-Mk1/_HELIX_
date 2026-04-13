@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About — H.E.L.I.X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&family=Exo+2:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cyan:#00e5ff; --orange:#ff6a00; --green:#00ff41;
+  --bg:#020c14; --bg-card:rgba(6,15,26,0.95);
+  --text:#c8eef5; --dim:#6aabbc; --faint:#2e6878;
+  --border:rgba(0,229,255,0.14); --border-dim:rgba(0,229,255,0.07);
+  --glow-c:rgba(0,229,255,0.55); --glow-o:rgba(255,106,0,0.5);
+  --glow-g:rgba(0,255,65,0.6);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  background:var(--bg); color:var(--text);
+  font-family:'Exo 2',sans-serif;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:48px;
+}
+body::before{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.026) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.026) 1px,transparent 1px);
+  background-size:48px 48px;
+}
+body::after{
+  content:''; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.04) 3px,rgba(0,0,0,0.04) 4px);
+}
+.wrap{
+  position:relative; z-index:1;
+  width:100%; max-width:760px;
+  display:flex; flex-direction:column; align-items:center; gap:52px;
+  animation:rise 0.4s ease both;
+}
+
+/* ── MASTHEAD ── */
+.masthead{text-align:center; display:flex; flex-direction:column; gap:10px;}
+.logo{
+  font-family:'Orbitron',monospace; font-weight:900;
+  font-size:3rem; letter-spacing:0.38em; color:#fff;
+  text-shadow:0 0 8px #fff,0 0 22px var(--cyan),0 0 55px rgba(0,229,255,0.4),0 0 90px rgba(0,229,255,0.18);
+  line-height:1;
+}
+.logo .dot{
+  color:var(--orange);
+  text-shadow:0 0 14px var(--glow-o),0 0 30px rgba(255,106,0,0.35);
+  font-size:0.55em; padding:0 0.04em;
+}
+.tagline{
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px; letter-spacing:0.38em; color:var(--dim);
+}
+.status{
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.status-dot{
+  width:8px; height:8px; border-radius:50%;
+  background:var(--green); box-shadow:0 0 8px var(--glow-g);
+  animation:blink 2s ease-in-out infinite;
+}
+.status-text{
+  font-family:'Share Tech Mono',monospace;
+  font-size:12px; letter-spacing:0.32em; color:var(--green);
+  text-shadow:0 0 10px var(--glow-g);
+}
+
+/* ── BUTTON PAIR ── */
+.btn-pair{
+  display:grid; grid-template-columns:1fr 1fr; gap:16px;
+  width:100%;
+}
+.nav-btn{
+  display:flex; flex-direction:column; align-items:flex-start; gap:10px;
+  padding:32px 28px 26px;
+  border:1px solid var(--btn-border);
+  background:var(--bg-card);
+  text-decoration:none; color:inherit; cursor:pointer;
+  position:relative; overflow:hidden;
+  transition:border-color 0.22s, box-shadow 0.22s, background 0.22s;
+}
+/* left glow bar */
+.nav-btn::before{
+  content:''; position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--btn-c);
+  box-shadow:0 0 12px var(--btn-c);
+  opacity:0; transition:opacity 0.22s;
+}
+/* bg wash */
+.nav-btn::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(135deg,rgba(var(--btn-rgb),0.05) 0%,transparent 55%);
+  opacity:0; transition:opacity 0.22s;
+}
+.nav-btn:hover{border-color:var(--btn-c); box-shadow:0 0 28px rgba(var(--btn-rgb),0.14);}
+.nav-btn:hover::before{opacity:1;}
+.nav-btn:hover::after{opacity:1;}
+.nav-btn:hover .btn-arrow{opacity:1; transform:translateX(5px);}
+
+.nav-btn.stack  {--btn-c:var(--cyan);   --btn-rgb:0,229,255;  --btn-border:rgba(0,229,255,0.25);}
+.nav-btn.project{--btn-c:var(--orange); --btn-rgb:255,106,0; --btn-border:rgba(255,106,0,0.25);}
+
+.btn-eyebrow{
+  font-family:'Share Tech Mono',monospace; font-size:9px; letter-spacing:0.4em;
+  color:var(--btn-c); opacity:0.55; position:relative; z-index:1;
+}
+.btn-label{
+  font-family:'Orbitron',monospace; font-weight:900;
+  font-size:2.2rem; letter-spacing:0.18em; color:var(--btn-c);
+  line-height:1; position:relative; z-index:1;
+  transition:text-shadow 0.22s;
+}
+.nav-btn:hover .btn-label{text-shadow:0 0 20px var(--btn-c);}
+.btn-desc{
+  font-family:'Exo 2',sans-serif; font-weight:300;
+  font-size:13px; line-height:1.75; color:var(--dim);
+  position:relative; z-index:1; flex:1;
+}
+.btn-cta{
+  display:flex; align-items:center; gap:8px; width:100%;
+  font-family:'Orbitron',monospace; font-weight:700;
+  font-size:10px; letter-spacing:0.3em; color:var(--btn-c);
+  border-top:1px solid var(--btn-border); padding-top:14px;
+  position:relative; z-index:1;
+}
+.btn-arrow{
+  margin-left:auto; font-size:15px;
+  opacity:0.45; transition:opacity 0.2s,transform 0.2s;
+}
+
+/* ── FOOTER ── */
+.footer{
+  font-family:'Share Tech Mono',monospace;
+  font-size:10px; letter-spacing:0.22em; color:var(--faint);
+  text-align:center;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes rise{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+@keyframes blink{50%{opacity:0.15;}}
+
+::-webkit-scrollbar{width:4px;}
+::-webkit-scrollbar-thumb{background:#007a8c;border-radius:2px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="masthead">
+    <div class="logo">H<span class="dot">·</span>E<span class="dot">·</span>L<span class="dot">·</span>I<span class="dot">·</span>X</div>
+    <div class="tagline">High-Energy Learning Intelligence eXploration</div>
+    <div class="status">
+      <div class="status-dot"></div>
+      <span class="status-text">SYSTEM ONLINE</span>
+    </div>
+  </div>
+
+  <div class="btn-pair">
+
+    <a class="nav-btn stack" href="stack.html">
+      <div class="btn-eyebrow">SOFTWARE · SYSTEMS · DESIGN</div>
+      <div class="btn-label">STACK</div>
+      <div class="btn-desc">The technical architecture — ML framework, backend, frontend design system, and the MaxEnt-grounded training objective.</div>
+      <div class="btn-cta">ENTER <span class="btn-arrow">→</span></div>
+    </a>
+
+    <a class="nav-btn project" href="project.html">
+      <div class="btn-eyebrow">ATLAS · LHC · UA HEP GROUP</div>
+      <div class="btn-label">PROJECT</div>
+      <div class="btn-desc">Run 3 Long-Lived Particle search — MSVtx cutflow pipeline, mass point datasets, and the HELIX ML system.</div>
+      <div class="btn-cta">ENTER <span class="btn-arrow">→</span></div>
+    </a>
+
+  </div>
+
+  <div class="footer">H·E·L·I·X &nbsp;·&nbsp; N. HERLING &nbsp;·&nbsp; UNIVERSITY OF ARIZONA</div>
+
+</div>
+</body>
+</html>
