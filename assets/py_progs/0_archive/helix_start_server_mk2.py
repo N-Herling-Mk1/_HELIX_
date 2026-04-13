@@ -200,47 +200,8 @@ def get_registry() -> PidRegistry:
     return _pid_registry
 
 # ═════════════════════════════════════════════════════════════════════════════
-#  BROWSER HELPER — open URL in a new window using the default browser
+#  AUDIO SEQUENCE THREAD
 # ═════════════════════════════════════════════════════════════════════════════
-
-def _get_default_browser_exe() -> str | None:
-    """Return the executable path of the default browser on Windows, or None."""
-    if sys.platform != "win32":
-        return None
-    try:
-        import winreg
-        # Read the ProgID for http
-        with winreg.OpenKey(winreg.HKEY_CURRENT_USER,
-                r"Software\\Microsoft\\Windows\\Shell\\Associations\\"
-                r"UrlAssociations\\http\\UserChoice") as k:
-            prog_id = winreg.QueryValueEx(k, "ProgId")[0]
-        # Resolve ProgID to executable
-        with winreg.OpenKey(winreg.HKEY_CLASSES_ROOT,
-                rf"{prog_id}\\shell\\open\\command") as k:
-            cmd = winreg.QueryValueEx(k, "")[0]
-        # Extract the exe path — may be quoted
-        exe = cmd.split('"')[1] if cmd.startswith('"') else cmd.split()[0]
-        return exe
-    except Exception:
-        return None
-
-def _open_new_window(url: str):
-    """Open url in a new browser window, using the system default browser."""
-    exe = _get_default_browser_exe()
-    if exe:
-        exe_lower = exe.lower()
-        # Chromium-based: Chrome, Edge, Brave, Opera, Vivaldi
-        if any(b in exe_lower for b in ("chrome", "msedge", "brave", "opera", "vivaldi")):
-            subprocess.Popen([exe, "--new-window", url],
-                             creationflags=WIN_HIDE)
-            return
-        # Firefox
-        if "firefox" in exe_lower:
-            subprocess.Popen([exe, "-new-window", url],
-                             creationflags=WIN_HIDE)
-            return
-    # Fallback — best-effort via webbrowser module
-    webbrowser.open(url, new=1)
 
 class AudioSequenceThread(QThread):
     done = pyqtSignal()
@@ -1123,8 +1084,7 @@ class HelixLauncher(QMainWindow):
     def _open_control(self):
         def _go():
             try:
-                _open_new_window(CTRL_URL)
-                log(f"[browser] {CTRL_URL}")
+                webbrowser.open(CTRL_URL, new=1); log(f"[browser] {CTRL_URL}")
             except Exception: log_exc("[browser]")
         threading.Thread(target=_go, daemon=True).start()
 
