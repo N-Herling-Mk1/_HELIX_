@@ -192,43 +192,64 @@ class AudioEngine(threading.Thread):
     def __init__(self, fp, nb, sig):
         super().__init__(daemon=True)
         self.fp=fp; self.nb=nb; self.sig=sig; self._stop=False
+        self._stream = None   # held so stop() can close it from outside
+
+    def stop(self):
+        """Request the engine to stop. Safe to call from any thread."""
+        self._stop = True
 
     def run(self):
         try:
-            audio, sr = sf.read(self.fp, always_2d=True)
+            try:
+                audio, sr = sf.read(self.fp, always_2d=True)
+            except Exception as e:
+                print(f"[Audio] failed to read file: {e}")
+                return   # finally block still emits done
+
+            mono = audio.mean(axis=1).astype(np.float32)
+            pk   = np.abs(mono).max()
+            if pk > 1e-9: mono /= pk
+
+            pos   = [0]
+            edges = np.logspace(math.log10(FREQ_LOW),
+                                math.log10(min(FREQ_HIGH, sr/2-1)),
+                                self.nb+1)
+            rmax  = [1e-9]
+
+            def cb(outdata, frames, _t, status):
+                chunk = mono[pos[0]:pos[0]+frames].copy()
+                if len(chunk) < frames:
+                    chunk = np.pad(chunk,(0,frames-len(chunk))); self._stop=True
+                outdata[:,0] = chunk; pos[0] += frames
+
+                spec  = np.abs(np.fft.rfft(chunk*np.hanning(len(chunk)), n=FFT_SIZE))
+                freqs = np.fft.rfftfreq(FFT_SIZE, 1./sr)
+                amps  = np.zeros(self.nb, dtype=np.float32)
+                for i in range(self.nb):
+                    mask=(freqs>=edges[i])&(freqs<edges[i+1])
+                    if mask.any(): amps[i]=spec[mask].mean()
+                rmax[0] = max(rmax[0]*NORM_DECAY, float(amps.max()))
+                amps   /= rmax[0]
+                self.sig.frame.emit(amps)
+
+            try:
+                with sd.OutputStream(samplerate=sr, channels=1,
+                                     blocksize=HOP_SIZE, callback=cb) as self._stream:
+                    while not self._stop:
+                        sd.sleep(8)
+            except Exception as e:
+                print(f"[Audio] stream error: {e}")
+            finally:
+                self._stream = None
+
         except Exception as e:
-            print(f"[Audio] {e}"); self.sig.done.emit(); return
-
-        mono = audio.mean(axis=1).astype(np.float32)
-        pk   = np.abs(mono).max()
-        if pk > 1e-9: mono /= pk
-
-        pos   = [0]
-        edges = np.logspace(math.log10(FREQ_LOW),
-                            math.log10(min(FREQ_HIGH, sr/2-1)),
-                            self.nb+1)
-        rmax  = [1e-4]
-
-        def cb(outdata, frames, _t, _s):
-            chunk = mono[pos[0]:pos[0]+frames]
-            if len(chunk) < frames:
-                chunk = np.pad(chunk,(0,frames-len(chunk))); self._stop=True
-            outdata[:,0] = chunk; pos[0] += frames
-
-            spec  = np.abs(np.fft.rfft(chunk*np.hanning(len(chunk)), n=FFT_SIZE))
-            freqs = np.fft.rfftfreq(FFT_SIZE, 1./sr)
-            amps  = np.zeros(self.nb, dtype=np.float32)
-            for i in range(self.nb):
-                mask=(freqs>=edges[i])&(freqs<edges[i+1])
-                if mask.any(): amps[i]=spec[mask].mean()
-            rmax[0] = max(rmax[0]*NORM_DECAY, float(amps.max()))
-            amps   /= rmax[0]
-            self.sig.frame.emit(amps)
-
-        with sd.OutputStream(samplerate=sr, channels=1,
-                             blocksize=HOP_SIZE, callback=cb):
-            while not self._stop: sd.sleep(8)
-        self.sig.done.emit()
+            print(f"[Audio] unexpected error: {e}")
+        finally:
+            # Always signal done so the widget fades out cleanly
+            try:
+                self.sig.done.emit()
+            except Exception:
+                pass
 
 # ═════════════════════════════════════════════════════════════════════════════
 #  Main widget
@@ -410,13 +431,26 @@ def main():
     signals.frame.connect(overlay.on_frame)
     signals.done.connect(overlay.on_done)
 
+    # Stop the audio engine cleanly whenever the Qt app exits
+    app.aboutToQuit.connect(engine.stop)
+
     print(f"[ARES CUBE]")
     print(f"  cube  : {FACE_G}×{FACE_G} viridis tiles · yaw {YAW_SPEED:.3f} r/f"
           f" · pitch {math.degrees(PITCH):.0f}° · pulse {PULSE_SCALE:.0%}")
     print(f"  plane : {N_COLS}×{N_SLICES} 2D heatmap only")
     print(f"  file  : {filepath}")
 
-    overlay.show(); engine.start(); sys.exit(app.exec())
+    try:
+        overlay.show()
+        engine.start()
+        sys.exit(app.exec())
+    except Exception as e:
+        print(f"[ARES CUBE] fatal: {e}")
+    finally:
+        try:
+            engine.stop()
+        except Exception:
+            pass
 
 if __name__ == "__main__":
     main()

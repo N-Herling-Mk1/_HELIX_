@@ -82,10 +82,81 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 
 .scanlines{position:fixed;inset:0;pointer-events:none;z-index:100;
   background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);}
+
+/* ── VIEW ONLY OVERLAY ── */
+.view-only-overlay {
+  display:none;
+  position:fixed; inset:0; z-index:200;
+  background:rgba(2,8,14,0.82);
+  backdrop-filter:blur(3px);
+  flex-direction:column; align-items:center; justify-content:center;
+  gap:24px;
+  pointer-events:all;
+}
+.view-only-overlay.active { display:flex; }
+.vo-badge {
+  font-family:'Orbitron',monospace; font-weight:900;
+  font-size:clamp(1.8rem,5vw,3.2rem); letter-spacing:0.4em;
+  color:var(--warn); text-shadow:0 0 20px rgba(255,106,0,0.6), 0 0 60px rgba(255,106,0,0.2);
+  animation:vo-pulse 2.5s ease-in-out infinite;
+}
+.vo-sub {
+  font-family:'Share Tech Mono',monospace;
+  font-size:13px; letter-spacing:0.3em;
+  color:rgba(255,255,255,0.55); text-align:center; line-height:1.8;
+  max-width:460px;
+}
+.vo-sub span { color:var(--cyan); }
+.vo-sub .vo-url { color:var(--ok); }
+.vo-dismiss {
+  font-family:'Share Tech Mono',monospace;
+  font-size:11px; letter-spacing:0.25em;
+  color:rgba(255,255,255,0.35);
+  background:transparent; border:1px solid rgba(255,255,255,0.15);
+  padding:10px 28px; cursor:pointer; margin-top:8px;
+  transition:color 0.2s, border-color 0.2s;
+}
+.vo-dismiss:hover { color:rgba(255,255,255,0.7); border-color:rgba(255,255,255,0.4); }
+.vo-corner {
+  position:absolute; width:40px; height:40px; pointer-events:none;
+}
+.vo-corner::before, .vo-corner::after {
+  content:''; position:absolute; background:var(--warn);
+  box-shadow:0 0 8px rgba(255,106,0,0.6);
+}
+.vo-corner::before { width:2px; height:100%; top:0; left:0; }
+.vo-corner::after  { width:100%; height:2px; top:0; left:0; }
+.vo-corner.tl { top:24px; left:24px; }
+.vo-corner.tr { top:24px; right:24px; transform:scaleX(-1); }
+.vo-corner.bl { bottom:24px; left:24px; transform:scaleY(-1); }
+.vo-corner.br { bottom:24px; right:24px; transform:scale(-1,-1); }
+
+@keyframes vo-pulse {
+  0%,100% { opacity:1; text-shadow:0 0 20px rgba(255,106,0,0.6),0 0 60px rgba(255,106,0,0.2); }
+  50%      { opacity:0.7; text-shadow:0 0 40px rgba(255,106,0,0.9),0 0 80px rgba(255,106,0,0.4); }
+}
 </style>
 </head>
 <body>
 <div class="scanlines"></div>
+
+<!-- VIEW ONLY OVERLAY — shown on static/GitHub Pages host -->
+<div class="view-only-overlay" id="view-only-overlay">
+  <div class="vo-corner tl"></div>
+  <div class="vo-corner tr"></div>
+  <div class="vo-corner bl"></div>
+  <div class="vo-corner br"></div>
+  <div class="vo-badge">VIEW ONLY</div>
+  <div class="vo-sub">
+    This control panel requires the <span>HELIX Flask server</span> running on
+    <span>localhost:5000</span> to function.<br><br>
+    You're currently on the static site — backend controls are disabled.<br>
+    To use this panel, run the server locally via
+    <span>helix_start_server.py</span> and open
+    <span class="vo-url">localhost:5000/control</span>.
+  </div>
+  <button class="vo-dismiss" onclick="dismissOverlay()">VIEW ANYWAY →</button>
+</div>
 <div class="wrap">
 
   <!-- LOGO -->
@@ -105,49 +176,6 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
     <span class="status-right">PORT 5000</span>
   </div>
 
-  <!-- BUTTONS -->
-  <div class="btn-grid">
-
-    <div class="action-card" style="--card-c:var(--cyan)" onclick="openEditor()">
-      <div class="card-icon">✏️</div>
-      <div class="card-title">EDITOR</div>
-      <div class="card-desc">Open the HELIX content editor — articles, notes, goals, tags, PDF uploads.</div>
-    </div>
-
-    <div class="action-card" style="--card-c:var(--ok)" onclick="openSite()">
-      <div class="card-icon">🌐</div>
-      <div class="card-title">VIEW SITE</div>
-      <div class="card-desc">Open main.html — the live HELIX navigation hub in a new tab.</div>
-    </div>
-
-    <div class="action-card" style="--card-c:var(--purple)" onclick="openAnalytics()">
-      <div class="card-icon">📡</div>
-      <div class="card-title">ANALYTICS</div>
-      <div class="card-desc">Open GoatCounter dashboard for live visitor and page-view stats.</div>
-    </div>
-
-    <div class="action-card" style="--card-c:var(--warn)" onclick="runCmd('pip_install')">
-      <div class="card-icon">⬇️</div>
-      <div class="card-title">INSTALL DEPS</div>
-      <div class="card-desc">Run pip install for flask, flask-cors, flask-socketio, pywebview.</div>
-      <div class="card-status" id="cs-pip"></div>
-    </div>
-
-    <div class="action-card" style="--card-c:var(--ok)" onclick="runCmd('gitignore_check')">
-      <div class="card-icon">⚙️</div>
-      <div class="card-title">CHECK .GITIGNORE</div>
-      <div class="card-desc">Verify .env is in .gitignore so API keys are never committed.</div>
-      <div class="card-status" id="cs-gi"></div>
-    </div>
-
-    <div class="action-card" style="--card-c:var(--err)" onclick="runCmd('clear_data')">
-      <div class="card-icon">🗑️</div>
-      <div class="card-title">CLEAR LOG</div>
-      <div class="card-desc">Clear the server log output panel below.</div>
-    </div>
-
-  </div>
-
   <!-- LOG -->
   <div>
     <div class="log-hdr">
@@ -162,6 +190,23 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 </div>
 
 <script>
+// ── VIEW ONLY DETECTION ──────────────────────────────────────────────────────
+(function() {
+  const STATIC_HOSTS = ['github.io', 'githubusercontent.com'];
+  const host = location.hostname;
+  const isStatic = STATIC_HOSTS.some(h => host.includes(h))
+                || (!['localhost','127.0.0.1'].includes(host) && host !== '');
+  if (isStatic) {
+    document.getElementById('view-only-overlay').classList.add('active');
+    // disable all action cards so they can't fire even if dismissed
+    document.querySelectorAll('.action-card').forEach(c => c.classList.add('disabled'));
+  }
+})();
+
+function dismissOverlay() {
+  document.getElementById('view-only-overlay').classList.remove('active');
+}
+
 // ── STATUS POLL ───────────────────────────────────────────────────────────────
 let serverLive = false;
 
