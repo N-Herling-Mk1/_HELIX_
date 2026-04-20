@@ -1,7 +1,7 @@
 """
 HELIX Server — helix_server.py
 """
-import sys, json, os, subprocess, threading, re, time
+import sys, json, os, subprocess, threading
 from pathlib import Path
 
 try:
@@ -25,9 +25,6 @@ ROOT       = SCRIPT_DIR.parent.parent       # …/_HELIX_
 DATA_FILE  = ROOT / "data" / "helix_data.json"
 PREFS_FILE = ROOT / "data" / "user_prefs.json"
 DOCS_DIR   = ROOT / "docs"
-BULK_DB_DIR      = ROOT / "assets" / "bulk_db"
-BULK_DB_MANIFEST = BULK_DB_DIR / "manifest.json"
-BULK_DB_ALLOWED  = {"pdf", "docx", "pptx", "xlsx", "csv", "json", "md"}
 
 # Write PID file so kill_helix.bat and the launcher can kill us precisely
 _PID_FILE = ROOT / "data" / "server.pid"
@@ -45,7 +42,6 @@ def _cleanup_pid():
     except Exception: pass
 
 app = Flask(__name__, static_folder=str(ROOT))
-app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024   # 100 MB upload cap
 CORS(app)
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode="threading")
 
@@ -175,105 +171,6 @@ def run_cmd():
         else: return jsonify({"error":f"unknown: {cmd}"}),400
         return jsonify({"status":"ok","output":output})
     except Exception as e: return jsonify({"error":str(e),"output":output})
-
-# ── bulk_db: local backend component uploader ────────────────────────────────
-def _now_iso():
-    return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-
-def _safe_filename(name: str) -> str:
-    # strip directory parts, replace unsafe chars, cap length
-    name = os.path.basename(name or "")
-    name = re.sub(r'[^A-Za-z0-9._-]', '_', name)
-    return name[:120] or "unnamed"
-
-def _next_bulk_id(components):
-    nums = []
-    for c in components:
-        m = re.match(r'^bd-(\d+)$', c.get("id",""))
-        if m: nums.append(int(m.group(1)))
-    n = (max(nums) + 1) if nums else 1
-    return f"bd-{n:04d}"
-
-def load_bulk_manifest():
-    try:
-        if BULK_DB_MANIFEST.exists():
-            return json.loads(BULK_DB_MANIFEST.read_text(encoding="utf-8"))
-    except Exception: pass
-    return {"version": 1, "updated": "", "components": []}
-
-def save_bulk_manifest(m):
-    BULK_DB_DIR.mkdir(parents=True, exist_ok=True)
-    m["updated"] = _now_iso()
-    BULK_DB_MANIFEST.write_text(
-        json.dumps(m, indent=2, ensure_ascii=False), encoding="utf-8")
-
-@app.route("/api/bulk_db/list", methods=["GET"])
-def bulk_list():
-    return jsonify(load_bulk_manifest())
-
-@app.route("/api/bulk_db/upload", methods=["POST"])
-def bulk_upload():
-    f = request.files.get("file")
-    if not f or not f.filename:
-        return jsonify({"error": "file required"}), 400
-    ext = f.filename.rsplit(".", 1)[-1].lower() if "." in f.filename else ""
-    if ext not in BULK_DB_ALLOWED:
-        return jsonify({"error": f"type '.{ext}' not allowed",
-                        "allowed": sorted(BULK_DB_ALLOWED)}), 400
-
-    # form metadata
-    name        = (request.form.get("name") or "").strip() or f.filename
-    description = (request.form.get("description") or "").strip()
-    sectors_raw = request.form.get("sectors") or ""   # comma-sep "H,E"
-    sectors     = [s.strip().upper() for s in sectors_raw.split(",")
-                   if s.strip().upper() in set("HELIX")]
-    tags_raw    = request.form.get("tags") or ""
-    tags        = [t.strip() for t in tags_raw.split(",") if t.strip()]
-
-    # save file, resolve name collisions
-    BULK_DB_DIR.mkdir(parents=True, exist_ok=True)
-    safe = _safe_filename(f.filename)
-    dest = BULK_DB_DIR / safe
-    if dest.exists():
-        stem, suffix = Path(safe).stem, Path(safe).suffix
-        i = 1
-        while (BULK_DB_DIR / f"{stem}_{i}{suffix}").exists():
-            i += 1
-        dest = BULK_DB_DIR / f"{stem}_{i}{suffix}"
-        safe = dest.name
-    f.save(str(dest))
-
-    # append manifest
-    m = load_bulk_manifest()
-    comp = {
-        "id":          _next_bulk_id(m["components"]),
-        "name":        name,
-        "filename":    safe,
-        "path":        f"assets/bulk_db/{safe}",
-        "type":        ext,
-        "size_bytes":  dest.stat().st_size,
-        "sectors":     sectors,
-        "tags":        tags,
-        "description": description,
-        "added":       _now_iso(),
-    }
-    m["components"].append(comp)
-    save_bulk_manifest(m)
-    return jsonify({"status": "ok", "component": comp})
-
-@app.route("/api/bulk_db/<comp_id>", methods=["DELETE"])
-def bulk_delete(comp_id):
-    m = load_bulk_manifest()
-    target = next((c for c in m["components"] if c.get("id") == comp_id), None)
-    if not target:
-        return jsonify({"error": "not found"}), 404
-    # remove file from disk
-    try: (ROOT / target["path"]).unlink(missing_ok=True)
-    except Exception: pass
-    # remove from manifest
-    m["components"] = [c for c in m["components"] if c.get("id") != comp_id]
-    save_bulk_manifest(m)
-    return jsonify({"status": "ok", "deleted": comp_id})
 
 # ── terminal ──────────────────────────────────────────────────────────────────
 _sessions = {}

@@ -5,6 +5,50 @@
 (function () {
   "use strict";
 
+  /* ── BULK_DB MANIFEST LOADING ── */
+  // Fetches assets/bulk_db/manifest.json and merges each component into the
+  // matching sector's articles array. Works on both localhost (Flask serves
+  // it as a static file) and on GitHub Pages (committed manifest is served
+  // directly). Non-blocking — if it fails, we just keep whatever articles.js
+  // already has.
+  let manifestLoaded = false;
+  async function loadManifest() {
+    try {
+      const r = await fetch('assets/bulk_db/manifest.json?t=' + Date.now());
+      if (!r.ok) return;
+      const m = await r.json();
+      mergeManifestIntoSectors(m.components || []);
+      manifestLoaded = true;
+      // re-render if a sector/tab was selected before manifest arrived
+      if (activeSector && activeTab) {
+        const s = HELIX_SECTORS.find(x => x.letter === activeSector);
+        if (s) renderContent(s, activeTab);
+        updateNavCounts(activeTab);
+      }
+    } catch (e) { /* silent — manifest optional */ }
+  }
+  function mergeManifestIntoSectors(components) {
+    for (const c of components) {
+      const article = {
+        id:       c.id,
+        title:    c.name || c.filename || '(untitled)',
+        authors:  c.authors || '',
+        year:     c.year || (c.added ? c.added.slice(0, 4) : ''),
+        tags:     c.tags || [],
+        abstract: c.description || '',
+        file:     c.path,
+        status:   'published'
+      };
+      for (const letter of (c.sectors || [])) {
+        const sec = HELIX_SECTORS.find(x => x.letter === letter);
+        if (sec) {
+          sec.articles = sec.articles || [];
+          sec.articles.push(article);
+        }
+      }
+    }
+  }
+
   /* ── ELEMENTS ── */
   const sectorBtns    = document.querySelectorAll(".sector-btn");
   const subtabs       = document.querySelectorAll(".subtab");
@@ -280,5 +324,8 @@
     resize(); spawn(); draw();
     window.addEventListener("resize", ()=>{ resize(); spawn(); });
   }
+
+  /* ── KICK OFF MANIFEST LOAD ── */
+  loadManifest();
 
 })();

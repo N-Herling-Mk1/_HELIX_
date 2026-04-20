@@ -98,7 +98,7 @@
     const IMAGES = [
       'assets/img/spiral_flavor.png',
       'assets/img/helix_sleek.png',
-      'assets/img/helix_abstract.png'
+      'assets/img/helix_fusion_ha.png'
     ];
     const LABELS = ['SPIRAL','SLEEK','ABSTRACT'];
     if (window.HELIX_GLITCH) HELIX_GLITCH.setImage(idx);

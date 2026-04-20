@@ -6,71 +6,162 @@
 <link rel="icon" type="image/x-icon" href="assets/img/helix_64.ico">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#020c14;--bg2:#060f1a;--bg3:#0d1a26;--border:#0d2235;--border2:#1a3a55;
-  --dim:#1e4060;--text:#c8dce8;--text2:#4a6880;
-  --cyan:#00e5ff;--ok:#00ff41;--err:#ff2255;--warn:#ff6a00;--purple:#b044ff;}
+:root{
+  --bg:#020c14;--bg2:#060f1a;--bg3:#0d1a26;
+  --border:#0d2235;--border2:#1a3a55;--dim:#1e4060;
+  --text:#c8dce8;--text2:#4a6880;
+  --cyan:#00e5ff;--ok:#00ff41;--err:#ff2255;--warn:#ff6a00;--purple:#b044ff;
+  --H:#00e5ff;--E:#b044ff;--L:#00ff41;--I:#ff6a00;--X:#ff2255;
+}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Share Tech Mono',monospace;}
-body{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px;padding:32px;}
+html,body{min-height:100%;background:var(--bg);color:var(--text);
+  font-family:'Share Tech Mono',monospace;}
+body{display:flex;flex-direction:column;align-items:center;
+  gap:24px;padding:32px 24px 64px;}
 
 /* bg grid */
 body::before{content:'';position:fixed;inset:0;pointer-events:none;
   background-image:radial-gradient(rgba(0,229,255,.06) 1px,transparent 1px);
   background-size:32px 32px;z-index:0;}
 
-.wrap{position:relative;z-index:1;width:100%;max-width:820px;display:flex;flex-direction:column;gap:24px;}
+.wrap{position:relative;z-index:1;width:100%;max-width:960px;
+  display:flex;flex-direction:column;gap:20px;}
 
 /* logo */
 .logo-row{display:flex;align-items:center;justify-content:center;gap:20px;}
-.logo-img{width:180px;height:auto;display:block;}
-.logo-text{display:flex;flex-direction:column;gap:6px;}
-.logo-h1{font-family:'Orbitron',monospace;font-weight:900;font-size:28px;
+.logo-img{width:160px;height:auto;display:block;}
+.logo-text{display:flex;flex-direction:column;gap:4px;}
+.logo-h1{font-family:'Orbitron',monospace;font-weight:900;font-size:26px;
   letter-spacing:8px;color:var(--cyan);text-shadow:0 0 24px rgba(0,229,255,.5);}
 .logo-sub{font-size:10px;letter-spacing:5px;color:var(--text2);}
 
 /* status bar */
-.status-bar{
-  display:flex;align-items:center;gap:12px;padding:10px 16px;
-  border:1px solid var(--border2);background:var(--bg2);
-}
+.status-bar{display:flex;align-items:center;gap:12px;padding:10px 16px;
+  border:1px solid var(--border2);background:var(--bg2);}
 .status-dot{width:10px;height:10px;border-radius:50%;background:var(--err);
   box-shadow:0 0 8px var(--err);animation:pulse 1.2s ease-in-out infinite;}
 .status-dot.live{background:var(--ok);box-shadow:0 0 8px var(--ok);}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .status-text{font-size:11px;letter-spacing:3px;}
-.status-url{font-size:10px;color:var(--cyan);letter-spacing:1px;text-decoration:none;margin-left:4px;}
+.status-url{font-size:10px;color:var(--cyan);letter-spacing:1px;
+  text-decoration:none;margin-left:4px;}
 .status-url:hover{text-shadow:0 0 8px var(--cyan);}
 .status-right{margin-left:auto;font-size:9px;letter-spacing:2px;color:var(--text2);}
 
-/* grid of buttons */
-.btn-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+/* section */
+.sec{display:flex;flex-direction:column;gap:10px;}
+.sec-hdr{display:flex;align-items:center;gap:10px;padding-bottom:6px;
+  border-bottom:1px solid var(--border);}
+.sec-title{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;
+  letter-spacing:4px;color:var(--cyan);}
+.sec-sub{font-size:9px;letter-spacing:2px;color:var(--text2);margin-left:auto;}
 
-.action-card{
-  padding:18px 16px;border:1px solid var(--border2);background:var(--bg2);
-  cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:8px;
-  position:relative;overflow:hidden;
-}
-.action-card::before{
-  content:'';position:absolute;inset:0;opacity:0;transition:opacity .2s;
-  background:linear-gradient(135deg,rgba(0,229,255,.05),transparent);
-}
-.action-card:hover{border-color:var(--card-c,var(--cyan));background:var(--bg3);}
-.action-card:hover::before{opacity:1;}
-.action-card:hover .card-icon{text-shadow:0 0 12px var(--card-c,var(--cyan));}
-.action-card:active{transform:scale(.99);}
-.action-card.disabled{opacity:.35;cursor:default;pointer-events:none;}
+/* pathway cards */
+.nav-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.nav-card{padding:16px;border:1px solid var(--border2);background:var(--bg2);
+  cursor:pointer;transition:all .2s;display:flex;flex-direction:column;gap:6px;
+  position:relative;overflow:hidden;text-decoration:none;color:inherit;}
+.nav-card:hover{border-color:var(--nc-c,var(--cyan));background:var(--bg3);
+  box-shadow:0 0 16px rgba(0,229,255,.08);}
+.nav-card:active{transform:scale(.99);}
+.nav-card.disabled{opacity:.35;cursor:default;pointer-events:none;}
+.nc-ico{font-size:20px;line-height:1;}
+.nc-title{font-family:'Orbitron',monospace;font-weight:700;font-size:10px;
+  letter-spacing:3px;color:var(--nc-c,var(--cyan));}
+.nc-desc{font-size:9px;letter-spacing:1px;color:var(--text2);line-height:1.6;}
+.nav-card[data-color="purple"]{--nc-c:var(--purple);}
+.nav-card[data-color="green"]{--nc-c:var(--ok);}
 
-.card-icon{font-size:20px;line-height:1;}
-.card-title{font-family:'Orbitron',monospace;font-size:10px;font-weight:700;
-  letter-spacing:3px;color:var(--card-c,var(--cyan));}
-.card-desc{font-size:9px;letter-spacing:1px;color:var(--text2);line-height:1.6;}
-.card-status{font-size:9px;letter-spacing:1px;margin-top:4px;}
+/* form */
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.fld{display:flex;flex-direction:column;gap:4px;}
+.fld.full{grid-column:1 / -1;}
+.fld label{font-size:9px;letter-spacing:2px;color:var(--text2);}
+.fld input[type="text"],.fld input[type="file"],.fld textarea{
+  font-family:'Share Tech Mono',monospace;background:var(--bg3);
+  border:1px solid var(--border2);color:var(--text);
+  padding:8px 10px;font-size:11px;outline:none;transition:border-color .2s;
+  width:100%;resize:vertical;}
+.fld input:focus,.fld textarea:focus{border-color:var(--cyan);}
+.fld textarea{min-height:60px;}
+.fld input[type="file"]{padding:6px;cursor:pointer;}
+.fld input[type="file"]::file-selector-button{
+  font-family:'Share Tech Mono',monospace;background:var(--bg2);
+  border:1px solid var(--border2);color:var(--cyan);
+  padding:4px 10px;margin-right:10px;cursor:pointer;
+  font-size:10px;letter-spacing:1px;}
+.fld input[type="file"]::file-selector-button:hover{border-color:var(--cyan);}
+
+/* sector toggles */
+.sec-toggles{display:flex;gap:6px;}
+.sec-tog{flex:1;padding:8px 0;text-align:center;
+  font-family:'Orbitron',monospace;font-weight:900;font-size:14px;
+  letter-spacing:2px;background:var(--bg3);
+  border:1px solid var(--border2);color:var(--text2);
+  cursor:pointer;transition:all .15s;}
+.sec-tog[data-s="H"]{--st-c:var(--H);}
+.sec-tog[data-s="E"]{--st-c:var(--E);}
+.sec-tog[data-s="L"]{--st-c:var(--L);}
+.sec-tog[data-s="I"]{--st-c:var(--I);}
+.sec-tog[data-s="X"]{--st-c:var(--X);}
+.sec-tog:hover{border-color:var(--st-c);color:var(--st-c);}
+.sec-tog.active{background:var(--st-c);color:#020c14;border-color:var(--st-c);
+  box-shadow:0 0 10px var(--st-c);}
+
+/* submit */
+.submit-row{display:flex;align-items:center;gap:10px;margin-top:4px;}
+.submit-btn{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;
+  letter-spacing:3px;padding:10px 22px;cursor:pointer;
+  background:var(--cyan);color:#020c14;border:1px solid var(--cyan);
+  box-shadow:0 0 12px rgba(0,229,255,.3);transition:all .2s;}
+.submit-btn:hover{box-shadow:0 0 20px rgba(0,229,255,.5);}
+.submit-btn:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+.submit-note{font-size:9px;letter-spacing:1px;color:var(--text2);}
+
+/* component list */
+.comp-filter{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.comp-filter .sec-tog{padding:4px 10px;font-size:11px;flex:0 0 auto;}
+.comp-filter .sec-tog[data-s="ALL"]{--st-c:var(--cyan);color:var(--cyan);
+  border-color:var(--dim);}
+.comp-filter .sec-tog[data-s="ALL"].active{background:var(--cyan);color:#020c14;}
+.comp-count{margin-left:auto;font-size:9px;letter-spacing:2px;color:var(--text2);}
+
+.comp-list{display:flex;flex-direction:column;gap:8px;}
+.comp-row{display:grid;grid-template-columns:auto 1fr auto;gap:14px;
+  align-items:center;padding:10px 14px;
+  border:1px solid var(--border);background:var(--bg2);}
+.comp-row:hover{border-color:var(--border2);}
+.comp-type{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;
+  letter-spacing:2px;padding:3px 6px;border:1px solid var(--border2);
+  color:var(--cyan);min-width:42px;text-align:center;}
+.comp-body{display:flex;flex-direction:column;gap:4px;min-width:0;}
+.comp-name{font-size:12px;color:var(--text);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.comp-meta{display:flex;gap:10px;font-size:9px;color:var(--text2);
+  letter-spacing:1px;}
+.comp-sectors{display:flex;gap:3px;}
+.comp-sec{font-family:'Orbitron',monospace;font-weight:700;font-size:9px;
+  padding:1px 4px;border:1px solid;letter-spacing:1px;}
+.comp-sec[data-s="H"]{color:var(--H);border-color:var(--H);}
+.comp-sec[data-s="E"]{color:var(--E);border-color:var(--E);}
+.comp-sec[data-s="L"]{color:var(--L);border-color:var(--L);}
+.comp-sec[data-s="I"]{color:var(--I);border-color:var(--I);}
+.comp-sec[data-s="X"]{color:var(--X);border-color:var(--X);}
+.comp-desc{font-size:10px;color:var(--text2);line-height:1.5;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.comp-actions{display:flex;gap:6px;flex-shrink:0;}
+.comp-btn{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:1px;
+  padding:4px 10px;background:transparent;border:1px solid var(--border2);
+  color:var(--text2);cursor:pointer;text-decoration:none;transition:all .15s;}
+.comp-btn:hover{color:var(--cyan);border-color:var(--cyan);}
+.comp-btn.danger:hover{color:var(--err);border-color:var(--err);}
+.comp-empty{padding:20px;text-align:center;font-size:10px;
+  letter-spacing:2px;color:var(--text2);
+  border:1px dashed var(--border);background:var(--bg2);}
 
 /* log */
-.log-box{
-  border:1px solid var(--border);background:var(--bg2);padding:10px 12px;
-  height:140px;overflow-y:auto;font-size:10px;color:var(--cyan);line-height:1.7;
-}
+.log-box{border:1px solid var(--border);background:var(--bg2);padding:10px 12px;
+  height:120px;overflow-y:auto;font-size:10px;color:var(--cyan);line-height:1.7;}
 .log-box::-webkit-scrollbar{width:4px}
 .log-box::-webkit-scrollbar-thumb{background:var(--dim)}
 .log-hdr{display:flex;align-items:center;justify-content:space-between;
@@ -81,60 +172,54 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 .log-clr:hover{color:var(--cyan);border-color:var(--cyan);}
 
 .scanlines{position:fixed;inset:0;pointer-events:none;z-index:100;
-  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);}
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,
+    rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);}
 
 /* ── VIEW ONLY OVERLAY ── */
-.view-only-overlay {
-  display:none;
-  position:fixed; inset:0; z-index:200;
-  background:rgba(2,8,14,0.82);
-  backdrop-filter:blur(3px);
-  flex-direction:column; align-items:center; justify-content:center;
-  gap:24px;
-  pointer-events:all;
+.view-only-overlay{display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(2,8,14,0.82);backdrop-filter:blur(3px);
+  flex-direction:column;align-items:center;justify-content:center;
+  gap:24px;pointer-events:all;}
+.view-only-overlay.active{display:flex;}
+.vo-badge{font-family:'Orbitron',monospace;font-weight:900;
+  font-size:clamp(1.8rem,5vw,3.2rem);letter-spacing:0.4em;
+  color:var(--warn);
+  text-shadow:0 0 20px rgba(255,106,0,0.6),0 0 60px rgba(255,106,0,0.2);
+  animation:vo-pulse 2.5s ease-in-out infinite;}
+.vo-sub{font-family:'Share Tech Mono',monospace;font-size:13px;
+  letter-spacing:0.3em;color:rgba(255,255,255,0.55);
+  text-align:center;line-height:1.8;max-width:460px;}
+.vo-sub span{color:var(--cyan);}
+.vo-sub .vo-url{color:var(--ok);}
+.vo-dismiss{font-family:'Share Tech Mono',monospace;font-size:11px;
+  letter-spacing:0.25em;color:rgba(255,255,255,0.35);
+  background:transparent;border:1px solid rgba(255,255,255,0.15);
+  padding:10px 28px;cursor:pointer;margin-top:8px;
+  transition:color 0.2s,border-color 0.2s;}
+.vo-dismiss:hover{color:rgba(255,255,255,0.7);border-color:rgba(255,255,255,0.4);}
+.vo-corner{position:absolute;width:40px;height:40px;pointer-events:none;}
+.vo-corner::before,.vo-corner::after{
+  content:'';position:absolute;background:var(--warn);
+  box-shadow:0 0 8px rgba(255,106,0,0.6);}
+.vo-corner::before{width:2px;height:100%;top:0;left:0;}
+.vo-corner::after{width:100%;height:2px;top:0;left:0;}
+.vo-corner.tl{top:24px;left:24px;}
+.vo-corner.tr{top:24px;right:24px;transform:scaleX(-1);}
+.vo-corner.bl{bottom:24px;left:24px;transform:scaleY(-1);}
+.vo-corner.br{bottom:24px;right:24px;transform:scale(-1,-1);}
+@keyframes vo-pulse{
+  0%,100%{opacity:1;
+    text-shadow:0 0 20px rgba(255,106,0,0.6),0 0 60px rgba(255,106,0,0.2);}
+  50%{opacity:0.7;
+    text-shadow:0 0 40px rgba(255,106,0,0.9),0 0 80px rgba(255,106,0,0.4);}
 }
-.view-only-overlay.active { display:flex; }
-.vo-badge {
-  font-family:'Orbitron',monospace; font-weight:900;
-  font-size:clamp(1.8rem,5vw,3.2rem); letter-spacing:0.4em;
-  color:var(--warn); text-shadow:0 0 20px rgba(255,106,0,0.6), 0 0 60px rgba(255,106,0,0.2);
-  animation:vo-pulse 2.5s ease-in-out infinite;
-}
-.vo-sub {
-  font-family:'Share Tech Mono',monospace;
-  font-size:13px; letter-spacing:0.3em;
-  color:rgba(255,255,255,0.55); text-align:center; line-height:1.8;
-  max-width:460px;
-}
-.vo-sub span { color:var(--cyan); }
-.vo-sub .vo-url { color:var(--ok); }
-.vo-dismiss {
-  font-family:'Share Tech Mono',monospace;
-  font-size:11px; letter-spacing:0.25em;
-  color:rgba(255,255,255,0.35);
-  background:transparent; border:1px solid rgba(255,255,255,0.15);
-  padding:10px 28px; cursor:pointer; margin-top:8px;
-  transition:color 0.2s, border-color 0.2s;
-}
-.vo-dismiss:hover { color:rgba(255,255,255,0.7); border-color:rgba(255,255,255,0.4); }
-.vo-corner {
-  position:absolute; width:40px; height:40px; pointer-events:none;
-}
-.vo-corner::before, .vo-corner::after {
-  content:''; position:absolute; background:var(--warn);
-  box-shadow:0 0 8px rgba(255,106,0,0.6);
-}
-.vo-corner::before { width:2px; height:100%; top:0; left:0; }
-.vo-corner::after  { width:100%; height:2px; top:0; left:0; }
-.vo-corner.tl { top:24px; left:24px; }
-.vo-corner.tr { top:24px; right:24px; transform:scaleX(-1); }
-.vo-corner.bl { bottom:24px; left:24px; transform:scaleY(-1); }
-.vo-corner.br { bottom:24px; right:24px; transform:scale(-1,-1); }
 
-@keyframes vo-pulse {
-  0%,100% { opacity:1; text-shadow:0 0 20px rgba(255,106,0,0.6),0 0 60px rgba(255,106,0,0.2); }
-  50%      { opacity:0.7; text-shadow:0 0 40px rgba(255,106,0,0.9),0 0 80px rgba(255,106,0,0.4); }
-}
+.offline-note{padding:10px 14px;border:1px solid var(--warn);
+  background:rgba(255,106,0,0.05);font-size:10px;letter-spacing:1px;
+  color:var(--warn);text-align:center;display:none;}
+body.server-offline .offline-note{display:block;}
+body.server-offline .submit-btn,
+body.server-offline .comp-btn.danger{opacity:.4;pointer-events:none;}
 </style>
 </head>
 <body>
@@ -142,10 +227,8 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
 
 <!-- VIEW ONLY OVERLAY — shown on static/GitHub Pages host -->
 <div class="view-only-overlay" id="view-only-overlay">
-  <div class="vo-corner tl"></div>
-  <div class="vo-corner tr"></div>
-  <div class="vo-corner bl"></div>
-  <div class="vo-corner br"></div>
+  <div class="vo-corner tl"></div><div class="vo-corner tr"></div>
+  <div class="vo-corner bl"></div><div class="vo-corner br"></div>
   <div class="vo-badge">VIEW ONLY</div>
   <div class="vo-sub">
     This control panel requires the <span>HELIX Flask server</span> running on
@@ -157,6 +240,7 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
   </div>
   <button class="vo-dismiss" onclick="dismissOverlay()">VIEW ANYWAY →</button>
 </div>
+
 <div class="wrap">
 
   <!-- LOGO -->
@@ -174,6 +258,95 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
     <span class="status-text" id="status-text">CHECKING...</span>
     <a class="status-url" id="status-url" href="#" style="display:none" target="_blank"></a>
     <span class="status-right">PORT 5000</span>
+  </div>
+
+  <div class="offline-note">
+    ⚠ SERVER OFFLINE · UPLOAD AND DELETE ARE DISABLED
+  </div>
+
+  <!-- PATHWAY CARDS -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <span class="sec-title">PATHWAYS</span>
+      <span class="sec-sub">NAVIGATION</span>
+    </div>
+    <div class="nav-grid">
+      <a class="nav-card" href="/editor" target="_blank" data-color="cyan">
+        <div class="nc-ico">✎</div>
+        <div class="nc-title">OPEN EDITOR</div>
+        <div class="nc-desc">Articles, notes, goals — sector-scoped content editor</div>
+      </a>
+      <a class="nav-card" href="/" target="_blank" data-color="green">
+        <div class="nc-ico">⌂</div>
+        <div class="nc-title">OPEN SITE</div>
+        <div class="nc-desc">Public-facing H·E·L·I·X page</div>
+      </a>
+      <a class="nav-card" href="https://helix-nherling.goatcounter.com/" target="_blank" data-color="purple">
+        <div class="nc-ico">📡</div>
+        <div class="nc-title">ANALYTICS</div>
+        <div class="nc-desc">GoatCounter · visitor stats, referrers, pages</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- BULK DB UPLOADER -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <span class="sec-title">BULK DB · UPLOAD COMPONENT</span>
+      <span class="sec-sub">assets/bulk_db/</span>
+    </div>
+    <div class="form-grid">
+      <div class="fld full">
+        <label for="f-file">FILE — pdf / docx / pptx / xlsx / csv / json / md (max 100 MB)</label>
+        <input type="file" id="f-file" accept=".pdf,.docx,.pptx,.xlsx,.csv,.json,.md">
+      </div>
+      <div class="fld">
+        <label for="f-name">DISPLAY NAME</label>
+        <input type="text" id="f-name" placeholder="Auto-filled from filename if blank">
+      </div>
+      <div class="fld">
+        <label for="f-tags">TAGS — comma separated</label>
+        <input type="text" id="f-tags" placeholder="atlas, llp, run3">
+      </div>
+      <div class="fld full">
+        <label for="f-desc">DESCRIPTION</label>
+        <textarea id="f-desc" placeholder="Short description of this component"></textarea>
+      </div>
+      <div class="fld full">
+        <label>SECTORS — toggle one or more</label>
+        <div class="sec-toggles" id="f-sectors">
+          <button type="button" class="sec-tog" data-s="H">H</button>
+          <button type="button" class="sec-tog" data-s="E">E</button>
+          <button type="button" class="sec-tog" data-s="L">L</button>
+          <button type="button" class="sec-tog" data-s="I">I</button>
+          <button type="button" class="sec-tog" data-s="X">X</button>
+        </div>
+      </div>
+      <div class="fld full submit-row">
+        <button class="submit-btn" id="submit-btn" onclick="doUpload()">▲ UPLOAD</button>
+        <span class="submit-note" id="submit-note"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK DB LIST -->
+  <div class="sec">
+    <div class="sec-hdr">
+      <span class="sec-title">BULK DB · COMPONENTS</span>
+      <span class="sec-sub" id="manifest-updated">—</span>
+    </div>
+    <div class="comp-filter">
+      <button class="sec-tog active" data-s="ALL" onclick="setFilter('ALL')">ALL</button>
+      <button class="sec-tog" data-s="H" onclick="setFilter('H')">H</button>
+      <button class="sec-tog" data-s="E" onclick="setFilter('E')">E</button>
+      <button class="sec-tog" data-s="L" onclick="setFilter('L')">L</button>
+      <button class="sec-tog" data-s="I" onclick="setFilter('I')">I</button>
+      <button class="sec-tog" data-s="X" onclick="setFilter('X')">X</button>
+      <span class="comp-count" id="comp-count">0 COMPONENTS</span>
+    </div>
+    <div class="comp-list" id="comp-list">
+      <div class="comp-empty">LOADING...</div>
+    </div>
   </div>
 
   <!-- LOG -->
@@ -198,87 +371,228 @@ body::before{content:'';position:fixed;inset:0;pointer-events:none;
                 || (!['localhost','127.0.0.1'].includes(host) && host !== '');
   if (isStatic) {
     document.getElementById('view-only-overlay').classList.add('active');
-    // disable all action cards so they can't fire even if dismissed
-    document.querySelectorAll('.action-card').forEach(c => c.classList.add('disabled'));
   }
 })();
-
 function dismissOverlay() {
   document.getElementById('view-only-overlay').classList.remove('active');
 }
 
 // ── STATUS POLL ───────────────────────────────────────────────────────────────
 let serverLive = false;
-
 async function checkServer() {
   try {
     const r = await fetch('/ping', {signal: AbortSignal.timeout(1500)});
     const d = await r.json();
-    if (d.helix) setLive(true);
-    else setLive(false);
+    setLive(!!d.helix);
   } catch(e) { setLive(false); }
 }
-
 function setLive(live) {
+  const wasLive = serverLive;
   serverLive = live;
-  const dot  = document.getElementById('status-dot');
-  const txt  = document.getElementById('status-text');
-  const url  = document.getElementById('status-url');
+  document.body.classList.toggle('server-offline', !live);
+  const dot = document.getElementById('status-dot');
+  const txt = document.getElementById('status-text');
+  const url = document.getElementById('status-url');
   dot.className = 'status-dot' + (live ? ' live' : '');
   txt.textContent = live ? 'SERVER  LIVE' : 'SERVER  OFFLINE';
   txt.style.color = live ? 'var(--ok)' : 'var(--err)';
   if (live) {
     url.style.display = 'inline';
-    url.textContent   = 'localhost:5000';
-    url.href          = 'http://localhost:5000';
+    url.textContent = 'localhost:5000';
+    url.href = 'http://localhost:5000';
   } else {
     url.style.display = 'none';
   }
+  // refresh list on transition to live
+  if (live && !wasLive) refreshList();
 }
-
 setInterval(checkServer, 3000);
 checkServer();
 
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
-function openEditor()    { window.open('/editor',   '_blank'); }
-function openSite()      { window.open('/',          '_blank'); }
-function openAnalytics() { window.open('https://helix-nherling.goatcounter.com/', '_blank'); }
+// ── SECTOR TOGGLES (form) ─────────────────────────────────────────────────────
+document.querySelectorAll('#f-sectors .sec-tog').forEach(btn => {
+  btn.addEventListener('click', () => btn.classList.toggle('active'));
+});
 
-// ── COMMANDS ──────────────────────────────────────────────────────────────────
-async function runCmd(cmd) {
-  log(`[SYS] Running: ${cmd} ...`);
+// ── AUTOFILL DISPLAY NAME FROM PICKED FILE ───────────────────────────────────
+document.getElementById('f-file').addEventListener('change', (e) => {
+  const f = e.target.files[0];
+  const nameInput = document.getElementById('f-name');
+  if (f && !nameInput.value.trim()) {
+    // strip extension: "my_paper.pdf" → "my_paper"
+    nameInput.value = f.name.replace(/\.[^.]+$/, '');
+  }
+});
+function selectedSectors() {
+  return [...document.querySelectorAll('#f-sectors .sec-tog.active')]
+    .map(b => b.dataset.s);
+}
+function clearForm() {
+  document.getElementById('f-file').value = '';
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-tags').value = '';
+  document.getElementById('f-desc').value = '';
+  document.querySelectorAll('#f-sectors .sec-tog').forEach(
+    b => b.classList.remove('active'));
+}
+
+// ── UPLOAD ────────────────────────────────────────────────────────────────────
+async function doUpload() {
+  if (!serverLive) { log('[ERR] Server offline — cannot upload.'); return; }
+  const fi = document.getElementById('f-file');
+  if (!fi.files.length) { log('[WARN] No file selected.'); return; }
+
+  const file = fi.files[0];
+  if (!confirm(`Upload ${file.name} (${fmtBytes(file.size)}) to bulk_db?`)) {
+    log('[SYS] Upload cancelled.');
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('name',        document.getElementById('f-name').value);
+  fd.append('description', document.getElementById('f-desc').value);
+  fd.append('tags',        document.getElementById('f-tags').value);
+  fd.append('sectors',     selectedSectors().join(','));
+
+  const btn = document.getElementById('submit-btn');
+  const note = document.getElementById('submit-note');
+  btn.disabled = true;
+  note.textContent = 'UPLOADING...';
+  log(`[SYS] Uploading ${file.name} (${fmtBytes(file.size)}) ...`);
+
   try {
-    const r = await fetch('/api/cmd', {
-      method: 'POST',
-      headers: {'Content-Type':'application/json'},
-      body: JSON.stringify({cmd})
-    });
+    const r = await fetch('/api/bulk_db/upload', {method:'POST', body:fd});
     const d = await r.json();
-    if (d.output) d.output.split('\n').forEach(l => { if(l.trim()) log(l); });
-    if (d.status === 'ok') log(`[OK]  ${cmd} complete.`);
-    else log(`[ERR] ${d.error || 'unknown error'}`);
+    if (!r.ok || d.error) {
+      log(`[ERR] ${d.error || 'upload failed'}`);
+      note.textContent = 'FAILED';
+    } else {
+      log(`[OK]  ${d.component.id} · ${d.component.filename} saved.`);
+      note.textContent = 'UPLOADED ✓';
+      clearForm();
+      refreshList();
+    }
+  } catch(e) {
+    log(`[ERR] ${e.message}`);
+    note.textContent = 'ERROR';
+  }
+  btn.disabled = false;
+  setTimeout(() => note.textContent = '', 4000);
+}
+
+// ── LIST + FILTER ─────────────────────────────────────────────────────────────
+let MANIFEST = {version:1, updated:'', components:[]};
+let activeFilter = 'ALL';
+
+async function refreshList() {
+  try {
+    const r = await fetch('/api/bulk_db/list');
+    MANIFEST = await r.json();
+  } catch(e) {
+    log(`[ERR] list: ${e.message}`);
+    MANIFEST = {version:1, updated:'', components:[]};
+  }
+  renderList();
+}
+function setFilter(s) {
+  activeFilter = s;
+  document.querySelectorAll('.comp-filter .sec-tog').forEach(
+    b => b.classList.toggle('active', b.dataset.s === s));
+  renderList();
+}
+function renderList() {
+  const box = document.getElementById('comp-list');
+  const cnt = document.getElementById('comp-count');
+  const upd = document.getElementById('manifest-updated');
+
+  upd.textContent = MANIFEST.updated
+    ? `LAST UPDATED · ${MANIFEST.updated}` : '—';
+
+  const comps = (MANIFEST.components || []).filter(c => {
+    if (activeFilter === 'ALL') return true;
+    return (c.sectors || []).includes(activeFilter);
+  });
+  cnt.textContent = `${comps.length} COMPONENT${comps.length===1?'':'S'}`;
+
+  if (!comps.length) {
+    box.innerHTML = '<div class="comp-empty">NO COMPONENTS'
+      + (activeFilter !== 'ALL' ? ` IN SECTOR ${activeFilter}` : '')
+      + '</div>';
+    return;
+  }
+
+  // newest-first
+  const rows = [...comps].reverse().map(c => {
+    const secs = (c.sectors || []).map(s =>
+      `<span class="comp-sec" data-s="${s}">${s}</span>`).join('');
+    const tagStr = (c.tags || []).length ? '[ ' + c.tags.join(', ') + ' ]' : '';
+    const desc = esc(c.description || '');
+    return `
+      <div class="comp-row">
+        <div class="comp-type">${esc((c.type||'').toUpperCase())}</div>
+        <div class="comp-body">
+          <div class="comp-name">${esc(c.name || c.filename)}</div>
+          <div class="comp-meta">
+            <span>${c.id}</span>
+            <span>${fmtBytes(c.size_bytes||0)}</span>
+            <span class="comp-sectors">${secs}</span>
+            <span>${esc(tagStr)}</span>
+          </div>
+          ${desc ? `<div class="comp-desc">${desc}</div>` : ''}
+        </div>
+        <div class="comp-actions">
+          <a class="comp-btn" href="/${c.path}" target="_blank">OPEN</a>
+          <button class="comp-btn danger" onclick="doDelete('${c.id}','${esc(c.name||c.filename)}')">DELETE</button>
+        </div>
+      </div>`;
+  }).join('');
+  box.innerHTML = rows;
+}
+
+async function doDelete(id, name) {
+  if (!serverLive) { log('[ERR] Server offline — cannot delete.'); return; }
+  if (!confirm(`Delete ${name}?\nFile will be removed from disk.`)) return;
+  log(`[SYS] Deleting ${id} ...`);
+  try {
+    const r = await fetch('/api/bulk_db/' + encodeURIComponent(id),
+      {method: 'DELETE'});
+    const d = await r.json();
+    if (!r.ok || d.error) log(`[ERR] ${d.error || 'delete failed'}`);
+    else { log(`[OK]  ${id} removed.`); refreshList(); }
   } catch(e) { log(`[ERR] ${e.message}`); }
 }
 
-// special case — clear log
-function clearLog() { document.getElementById('log-box').innerHTML = ''; }
-document.querySelector('[onclick="runCmd(\'clear_data\')"]').onclick = clearLog;
+// ── UTIL ──────────────────────────────────────────────────────────────────────
+function fmtBytes(n) {
+  if (n < 1024) return n + ' B';
+  if (n < 1024*1024) return (n/1024).toFixed(1) + ' KB';
+  if (n < 1024*1024*1024) return (n/1024/1024).toFixed(1) + ' MB';
+  return (n/1024/1024/1024).toFixed(2) + ' GB';
+}
+function esc(s) {
+  return String(s).replace(/[&<>"']/g,
+    c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
 
 // ── LOG ───────────────────────────────────────────────────────────────────────
+function clearLog() { document.getElementById('log-box').innerHTML = ''; }
 function log(msg) {
   const box = document.getElementById('log-box');
   const line = document.createElement('div');
   const col = msg.startsWith('[OK]')  ? 'var(--ok)'   :
               msg.startsWith('[ERR]') ? 'var(--err)'  :
-              msg.startsWith('[WARN]')? 'var(--warn)'  :
-              msg.startsWith('[SYS]') ? 'var(--text2)' : 'var(--cyan)';
+              msg.startsWith('[WARN]')? 'var(--warn)' :
+              msg.startsWith('[SYS]') ? 'var(--text2)': 'var(--cyan)';
   line.style.color = col;
   line.textContent = msg;
-  // clear placeholder
   if (box.querySelector('span')) box.innerHTML = '';
   box.appendChild(line);
   box.scrollTop = box.scrollHeight;
 }
+
+// Initial list attempt (in case server was already live at load)
+refreshList();
 </script>
 </body>
 </html>
