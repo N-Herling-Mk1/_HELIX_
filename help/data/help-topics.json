@@ -40,7 +40,7 @@
         "E .. EPISTEMIC ....... Epistemic Learning",
         "L .. LEARNING ........ Machine Learning",
         "I .. INFO THEORY ..... Entropy / Partition fn",
-        "X .. EXPLORATION ..... Detector topology"
+        "X .. EXPLORATION ..... Ai agent eXploration"
       ],
       "agent": [
         "The library is organized into five sectors, spelling H-E-L-I-X.",
