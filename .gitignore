@@ -1,34 +1,6 @@
-# System
-.DS_Store
-Thumbs.db
-
-# Editors
-.vscode/settings.json
-*.swp
-*.swo
-
-# Keep doc folder structure but ignore actual PDFs from git tracking
-# (add PDFs manually or via Git LFS)
-# docs/**/*.pdf
-
-# Node (if build tools ever added)
-node_modules/
-
-# ── HELIX runtime data ────────────────────────────────────────────────────────
-# These are machine-local — never commit them.
-data/helix_launcher.log
-data/helix_fault.log
-data/helix_pids.json
-data/server.pid
-data/user_prefs.json
-
-# Commit helix_data.json (your articles/notes/goals content)
-# — this is real content that should sync across machines.
-!data/helix_data.json
-
-# Python
 __pycache__/
 *.pyc
-*.pyo
-*.pyd
-.env
+.DS_Store
+Thumbs.db
+.vscode/
+node_modules/

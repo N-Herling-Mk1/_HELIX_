@@ -1,0 +1,150 @@
+/* ═══════════════════════════════════════════════════════════
+   HELIX — SHELL CHROME   css/shell.css
+   Topbar · hex view toggle · documentation control · status ·
+   PERSISTENT animated logo cell (Option B) · FX control panel.
+   Tokens from core.css. Pairs with js/shell.js.
+   ═══════════════════════════════════════════════════════════ */
+:root{ --rail-w:220px; --topbar-h:92px; --toggle-h:60px; }
+
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;}
+body{background:var(--bg);color:var(--text);font-family:'Exo 2',sans-serif;overflow:hidden;display:flex;flex-direction:column;}
+
+/* ambient layers */
+.grid-bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(0,229,255,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.035) 1px,transparent 1px);
+  background-size:48px 48px;}
+.scanlines{position:fixed;inset:0;z-index:26;pointer-events:none;opacity:.5;
+  background:repeating-linear-gradient(to bottom,transparent 0 2px,rgba(0,0,0,.16) 3px 4px);mix-blend-mode:multiply;}
+
+/* documentation is a light reading surface — drop the CRT scanlines + calm the grid over it */
+body.view-docs .scanlines{display:none;}
+body.view-docs .grid-bg{opacity:.25;}
+.corner{position:fixed;width:22px;height:22px;z-index:27;pointer-events:none;border-color:var(--cyan);opacity:.5;}
+.corner.tl{top:8px;left:8px;border-top:1px solid;border-left:1px solid;}
+.corner.tr{top:8px;right:8px;border-top:1px solid;border-right:1px solid;}
+.corner.bl{bottom:8px;left:8px;border-bottom:1px solid;border-left:1px solid;}
+.corner.br{bottom:8px;right:8px;border-bottom:1px solid;border-right:1px solid;}
+
+/* ── TOPBAR ── */
+.topbar{position:relative;z-index:25;flex-shrink:0;display:flex;align-items:center;gap:16px;
+  height:var(--topbar-h);padding:0 22px;border-bottom:1px solid var(--border);background:rgba(2,8,14,.95);backdrop-filter:blur(6px);overflow:hidden;}
+.topbar::after{content:'';position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,transparent 42%,rgba(0,229,255,.06) 50%,transparent 58%);
+  transform:translateX(-100%);animation:sweep 7s linear infinite;}
+@keyframes sweep{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
+
+.brand{display:flex;align-items:center;gap:16px;}
+.brand .wm{font-family:'Orbitron',monospace;font-weight:900;font-size:36px;letter-spacing:.3em;color:#eaf8ff;text-shadow:0 0 18px var(--glow-c);}
+.brand .wm .dot{color:var(--cyan);opacity:.7;margin:0 2px;}
+.brand .tag{font-family:'Share Tech Mono',monospace;font-size:14px;letter-spacing:.34em;color:var(--orange);text-transform:uppercase;text-shadow:0 0 10px var(--glow-o);}
+
+/* nav cluster — Back to Splash + Brand Toggle, grouped after the brand */
+.nav-group{display:flex;align-items:center;gap:10px;}
+.navbtn{display:flex;align-items:center;gap:7px;height:var(--toggle-h);white-space:nowrap;
+  font-family:'Share Tech Mono',monospace;font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--text-dim);background:rgba(0,229,255,.04);border:1px solid var(--border);border-radius:8px;
+  padding:0 15px;cursor:pointer;transition:all .18s;}
+.navbtn .navbtn-glyph{font-size:17px;line-height:1;opacity:.8;}
+.navbtn:hover{color:var(--text);border-color:var(--cyan);background:rgba(0,229,255,.09);box-shadow:0 0 12px var(--glow-c);}
+.navbtn:active{transform:translateY(1px);}
+
+/* group separators across the banner */
+.ctl-div{align-self:center;width:1px;height:var(--toggle-h);background:var(--border);opacity:.6;}
+
+/* ── VIEW TOGGLE — labeled box: hex badges + pill switch ── */
+.vt-wrap{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.vt-legend{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.3em;
+  text-transform:uppercase;color:var(--text-dim);}
+.viewtoggle{display:flex;align-items:stretch;height:var(--toggle-h);padding:3px;border:1px solid var(--border);
+  border-radius:32px;background:rgba(0,229,255,.03);transition:opacity .25s,filter .25s;}
+.viewtoggle.disabled{opacity:.32;pointer-events:none;filter:grayscale(.5);}
+.vt-cell{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  min-width:86px;padding:4px 18px;border:0;background:transparent;cursor:pointer;border-radius:28px;transition:background .3s;}
+.vt-cell + .vt-cell{margin-left:3px;}
+.vt-cell:hover{background:rgba(0,255,65,.06);}
+.vt-cell.active{background:radial-gradient(120% 130% at 50% 38%,rgba(0,255,65,.26),rgba(0,255,65,.03) 72%);}
+/* the hex itself is the transparent line-art used as a recolorable mask */
+.vt-hex{width:30px;height:30px;display:block;background:var(--text-faint);   /* inactive = dim steel */
+  -webkit-mask-position:center;mask-position:center;-webkit-mask-size:contain;mask-size:contain;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+  transition:background .3s,filter .35s,transform .3s;}
+.vt-trad{-webkit-mask-image:url(../assets/img/TRADITIONAL_view.png);mask-image:url(../assets/img/TRADITIONAL_view.png);}
+.vt-nova{-webkit-mask-image:url(../assets/img/HEXLIX_NOVA_view.png);mask-image:url(../assets/img/HEXLIX_NOVA_view.png);}
+.vt-cell:hover .vt-hex{background:var(--text-dim);}
+.vt-cell.active .vt-hex{background:var(--green);transform:scale(1.07);
+  filter:drop-shadow(0 0 5px var(--glow-g)) drop-shadow(0 0 15px var(--glow-g));}
+.vt-label{font-family:'Share Tech Mono',monospace;font-size:8.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-faint);white-space:nowrap;transition:color .3s,text-shadow .3s;}
+.vt-cell:hover .vt-label{color:var(--text-dim);}
+.vt-cell.active .vt-label{color:var(--green);text-shadow:0 0 10px var(--glow-g);}
+/* pill toggle widget — green knob slides to the current view */
+.vt-sep{align-self:center;width:1px;height:30px;background:var(--border);opacity:.55;margin:0 4px 0 10px;}
+.vt-switch{align-self:center;position:relative;width:52px;height:26px;flex-shrink:0;margin-right:6px;padding:0;cursor:pointer;
+  border:1px solid var(--border);border-radius:14px;background:rgba(0,229,255,.05);transition:border-color .3s,background .3s;}
+.vt-switch:hover{border-color:rgba(0,255,65,.45);background:rgba(0,255,65,.07);}
+.vt-knob{position:absolute;top:50%;left:3px;transform:translateY(-50%);width:18px;height:18px;border-radius:50%;
+  background:var(--green);box-shadow:0 0 9px var(--glow-g);transition:left .32s cubic-bezier(.4,1.4,.5,1),background .3s;}
+.vt-switch[aria-checked="true"] .vt-knob{left:31px;}
+
+/* ── DOCUMENTATION — standalone view control, active lit GREEN ── */
+.docbtn{align-self:center;display:flex;align-items:center;gap:8px;height:var(--toggle-h);
+  font-family:'Orbitron',monospace;font-weight:700;font-size:10.5px;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--text-dim);background:rgba(0,229,255,.03);
+  border:1px solid var(--border);border-radius:9px;padding:0 18px;cursor:pointer;transition:all .25s;white-space:nowrap;}
+.docbtn .docbtn-glyph{font-size:13px;line-height:1;opacity:.75;transition:opacity .25s;}
+.docbtn:hover{color:var(--text);border-color:rgba(0,255,65,.4);background:rgba(0,255,65,.06);}
+.docbtn.active{color:#021207;background:var(--green);border-color:var(--green);
+  box-shadow:0 0 18px var(--glow-g),inset 0 0 18px rgba(0,0,0,.18);}
+.docbtn.active .docbtn-glyph{opacity:1;}
+
+.status{display:flex;align-items:center;justify-content:flex-end;margin-left:auto;gap:14px;font-family:'Share Tech Mono',monospace;
+  font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim);}
+/* fixed footprint sized to the longest label ("RESEARCH · TRADITIONAL") so the
+   row never reflows when the active view changes */
+.sv-box{display:inline-block;width:290px;text-align:right;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;vertical-align:middle;}
+.status .led{width:11px;height:11px;border-radius:50%;background:var(--green);box-shadow:0 0 14px var(--glow-g);animation:pulse 2.4s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.status b{color:var(--cyan);font-weight:400;}
+/* Brand Toggle active state (uses #fx-toggle, now styled as .navbtn) */
+.navbtn.on{color:#020c14;background:var(--cyan);border-color:var(--cyan);box-shadow:0 0 14px var(--glow-c);}
+
+/* ── PERSISTENT ANIMATED LOGO CELL (constant across view swaps) ── */
+#shell-logo{position:fixed;top:var(--topbar-h);left:0;width:var(--rail-w);height:var(--rail-w);
+  z-index:24;background:#07090f;border-right:1px solid var(--border);border-bottom:1px solid var(--border-dim);
+  display:flex;align-items:center;justify-content:center;overflow:hidden;}
+#shell-logo canvas{display:block;width:100%;height:100%;cursor:pointer;}
+/* subtle inner frame to echo the rail */
+#shell-logo::after{content:'';position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 0 1px rgba(0,229,255,.05);}
+
+/* ── STAGE ── iframe sits beneath the fixed logo cell ── */
+.stage{position:relative;flex:1;min-height:0;z-index:2;}
+#view-frame{position:absolute;inset:0;width:100%;height:100%;border:0;display:block;background:var(--bg);}
+.veil{position:absolute;inset:0;z-index:5;pointer-events:none;display:flex;align-items:center;justify-content:center;
+  background:var(--bg);opacity:0;transition:opacity .25s;}
+.veil.on{opacity:1;}
+.veil .vtxt{font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.3em;color:var(--cyan);text-transform:uppercase;}
+.veil .vtxt::after{content:'';animation:dots 1.2s steps(4,end) infinite;}
+@keyframes dots{0%{content:''}25%{content:'.'}50%{content:'..'}75%{content:'...'}}
+
+/* ── FX CONTROL PANEL (slim Energy-Panel-2 analogue, shell-level) ── */
+#fx-panel{position:fixed;top:calc(var(--topbar-h) + 10px);right:18px;z-index:30;width:268px;
+  background:rgba(3,11,18,.97);border:1px solid var(--border);border-top:2px solid var(--cyan);
+  box-shadow:0 16px 50px rgba(0,0,0,.7),0 0 24px rgba(0,229,255,.12);
+  padding:16px;display:none;}
+#fx-panel.open{display:block;}
+#fx-panel .fxh{font-family:'Orbitron',monospace;font-weight:700;font-size:11px;letter-spacing:.24em;
+  color:var(--cyan);text-transform:uppercase;text-shadow:0 0 10px var(--glow-c);margin-bottom:12px;}
+#fx-panel .fxlabel{font-family:'Share Tech Mono',monospace;font-size:9px;letter-spacing:.26em;
+  color:var(--text-dim);text-transform:uppercase;margin:12px 0 7px;}
+#fx-panel .fxlabel:first-of-type{margin-top:0;}
+#fx-panel .fxrow{display:flex;gap:6px;}
+#fx-panel .fxbtn{flex:1;font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:.1em;
+  color:var(--cyan);background:rgba(0,229,255,.05);border:1px solid var(--border);padding:8px 6px;cursor:pointer;
+  transition:all .15s;white-space:nowrap;text-transform:uppercase;}
+#fx-panel .fxbtn:hover{background:rgba(0,229,255,.1);border-color:var(--cyan);}
+#fx-panel .fxbtn.active{background:var(--cyan);color:#020c14;border-color:var(--cyan);box-shadow:0 0 12px var(--glow-c);font-weight:700;}
+#fx-panel .fxbtn.warn{color:#ff7676;border-color:rgba(255,80,80,.3);background:rgba(120,20,20,.18);}
+#fx-panel .fxbtn.warn:hover{color:#ff5050;border-color:#ff3030;box-shadow:0 0 10px rgba(255,40,40,.3);}
+#fx-panel .fxdiv{height:1px;background:var(--border-dim);margin:12px 0;}
