@@ -1210,6 +1210,9 @@ function onEtchDone(){
   enterBtn.classList.add('live');
   enterBtn.style.opacity = 1;            // becomes interactive (still visually transparent)
   setStatus('Ready &mdash; <b>press to enter</b>', 'live');
+  // Splash is up and the main thread is idle — start building app.html in the
+  // background so it's ready (prerendered / cached) the instant ENTER is pressed.
+  if (window.__helixWarm) window.__helixWarm();
 }
 
 let lastT = performance.now();
@@ -1295,6 +1298,88 @@ requestAnimationFrame(loop);
 if (document.fonts && document.fonts.ready){
   document.fonts.ready.then(()=>{ buildEtchSprites(); });
 }
+</script>
+
+<!-- ════════════════════════════════════════════════════════════════════
+     APP WARM-UP — build app.html ahead of the ENTER click
+     ────────────────────────────────────────────────────────────────────
+     While the user sits on "PRESS TO ENTER" the main thread is idle, so we
+     spend that window getting app.html ready:
+
+       · Chromium → Speculation Rules `prerender`. The browser loads app.html
+         in a hidden renderer, runs shell.js, mounts the (same-origin) view
+         iframe and builds its DOM. Pressing ENTER then ACTIVATES that
+         prerender — an instant swap, not a fresh load. (Prerendered pages
+         don't run requestAnimationFrame, so glitch.js's render loop stays
+         paused until activation — the DOM builds without the animation
+         fighting this splash for CPU.)
+
+       · Everyone else → <link rel="prefetch"> warms the HTTP cache for
+         app.html and every resource it (and its first view) pull on boot,
+         so the post-ENTER navigation reuses cached bytes.
+
+     Fired from onEtchDone() (ENTER armed) with a load+timer fallback, and
+     gated through requestIdleCallback so it never janks the boot animation.
+     ════════════════════════════════════════════════════════════════════ -->
+<script>
+(function(){
+  "use strict";
+  var fired = false;
+
+  // Everything app.html needs on first paint + its default view (research/traditional).
+  var PREFETCH = [
+    'app.html',
+    // shell chrome
+    'css/core.css','css/shell.css','help/css/help.css',
+    'js/glitch.js','js/shell.js',
+    'help/js/audio-bus.js','help/js/terminal.js','help/js/agent.js','help/js/help-modal.js',
+    'help/plugins/audio/silent-plugin.js','help/plugins/audio/beep-plugin.js','help/plugins/audio/voice-plugin.js',
+    // default view + its assets (shell boots research/traditional)
+    'views/research-traditional.html',
+    'css/helix.css','css/main.css','css/views/view-shell.css',
+    'js/main.js','js/topbar.js','js/articles.js','js/views/embed.js',
+    // persistent logo art (the shell's animated brand)
+    'assets/img/spiral_flavor.png','assets/img/helix_sleek.png','assets/img/helix_fusion_ha.png'
+  ];
+
+  function supportsSpeculation(){
+    try { return !!(HTMLScriptElement.supports && HTMLScriptElement.supports('speculationrules')); }
+    catch(_){ return false; }
+  }
+
+  // Chromium: actually load + script + build app.html (and its view iframe) ahead of time.
+  function injectPrerender(){
+    var s = document.createElement('script');
+    s.type = 'speculationrules';
+    s.textContent = JSON.stringify({ prerender: [ { source:'list', urls:['app.html'] } ] });
+    document.head.appendChild(s);
+  }
+
+  // Others: warm the cache so the navigation is near-instant.
+  function injectPrefetch(){
+    var frag = document.createDocumentFragment();
+    PREFETCH.forEach(function(href){
+      var l = document.createElement('link');
+      l.rel = 'prefetch';
+      l.href = href;
+      if (/\.html$/.test(href)) l.as = 'document';   // hint; harmless if ignored
+      frag.appendChild(l);
+    });
+    document.head.appendChild(frag);
+  }
+
+  function warm(){
+    if (fired) return; fired = true;
+    var run = supportsSpeculation() ? injectPrerender : injectPrefetch;
+    if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 1500 });
+    else setTimeout(run, 0);
+  }
+
+  window.__helixWarm = warm;
+  // Fallback: warm even if the boot path never reaches onEtchDone (e.g. an
+  // animation error short-circuits arming).
+  window.addEventListener('load', function(){ setTimeout(warm, 1800); });
+})();
 </script>
 </body>
 </html>

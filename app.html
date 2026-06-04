@@ -26,15 +26,29 @@
 <script data-goatcounter="https://helix-nherling.goatcounter.com/count"
         async src="//gc.zgo.at/count.js"></script>
 <script>
-  window.addEventListener('load', function () {
-    (function fire() {
+  (function(){
+    var counted = false;
+    function fire(){
+      if (counted) return;
       if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        counted = true;
         window.goatcounter.count();
       } else {
-        setTimeout(fire, 200);  // count.js still arriving — retry quietly
+        setTimeout(fire, 200);   // count.js still arriving — retry quietly
       }
-    })();
-  });
+    }
+    function start(){
+      if (document.readyState === 'complete') fire();
+      else window.addEventListener('load', fire, { once:true });
+    }
+    // If this document is a Speculation-Rules prerender, don't count the view
+    // until it's actually activated (the user pressed ENTER on the splash).
+    if (document.prerendering) {
+      document.addEventListener('prerenderingchange', start, { once:true });
+    } else {
+      start();
+    }
+  })();
 </script>
 </head>
 <body>
@@ -138,5 +152,36 @@
 <script src="help/js/terminal.js"></script>
 <script src="help/js/agent.js"></script>
 <script src="help/js/help-modal.js"></script>
+
+<!-- ════ DIAGNOSTIC — prerender / activation check (safe to remove) ════
+     activationStart > 0  ⇒  this document was prerendered during the splash
+     and then ACTIVATED by the ENTER click (instant swap, not a cold load).
+     Logged after the page is actually shown so the reading is accurate even
+     when prerendering deferred it. -->
+<script>
+  (function(){
+    function report(){
+      try {
+        var nav = performance.getEntriesByType('navigation')[0];
+        if (!nav) { console.log('[HELIX] no navigation timing entry'); return; }
+        console.log(
+          'prerendered+activated:', nav.activationStart > 0,
+          '| activationStart(ms):', nav.activationStart
+        );
+      } catch (e) {
+        console.log('[HELIX] activation check failed:', e);
+      }
+    }
+    // If we were prerendered, activationStart isn't meaningful until the page
+    // is activated — wait for that. Otherwise just report after load.
+    if (document.prerendering) {
+      document.addEventListener('prerenderingchange', report, { once:true });
+    } else if (document.readyState === 'complete') {
+      report();
+    } else {
+      window.addEventListener('load', report, { once:true });
+    }
+  })();
+</script>
 </body>
 </html>
