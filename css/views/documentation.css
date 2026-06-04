@@ -208,6 +208,17 @@ dfn.gloss{font-style:normal;border-bottom:1px dotted var(--acc-cyan);cursor:help
 dfn.gloss:hover,dfn.gloss:focus{color:var(--acc-cyan);background:#eaf6fa;outline:none;border-radius:2px;}
 dfn.gloss-missing{font-style:normal;border-bottom:1px dotted #c0392b;}
 
+/* glossary filter / search bar */
+.gloss-search{display:flex;align-items:center;gap:16px;margin:8px 0 14px;max-width:920px;}
+.gloss-search-input{flex:1;min-width:0;font-family:'Exo 2',sans-serif;font-size:15px;color:var(--doc-ink);
+  background:#fff;border:1px solid var(--doc-line);border-radius:6px;padding:11px 15px;outline:none;
+  transition:border-color .15s,box-shadow .15s;}
+.gloss-search-input::placeholder{color:var(--doc-ink-faint);}
+.gloss-search-input:focus{border-color:var(--acc-cyan);box-shadow:0 0 0 3px rgba(0,150,181,.13);}
+.gloss-search-count{flex:none;font-family:'Share Tech Mono',monospace;font-size:12px;letter-spacing:.04em;
+  color:var(--doc-ink-faint);white-space:nowrap;}
+.gloss-empty{margin:18px 0;font-size:15px;font-style:italic;color:var(--doc-ink-faint);}
+
 /* glossary table */
 .gloss-cat{font-family:'Orbitron',sans-serif;font-weight:700;font-size:14px;letter-spacing:.04em;color:var(--acc-navy);
   margin:26px 0 8px;padding-bottom:6px;border-bottom:2px solid;border-image:linear-gradient(90deg,var(--acc-cyan-br),transparent) 1;}

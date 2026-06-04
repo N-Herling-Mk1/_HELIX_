@@ -95,7 +95,7 @@
     });
   }
 
-  /* ── full table, grouped by category ── */
+  /* ── full table, grouped by category, with live filter bar ── */
   function renderTable(el) {
     if (!el) return;
     return ensure().then(function () {
@@ -106,23 +106,82 @@
         : terms.map(function (t) { return t.cat || "Other"; })
                .filter(function (v, i, a) { return a.indexOf(v) === i; });
 
+      var total = terms.length;
+
+      /* search bar + results host */
+      el.innerHTML =
+        '<div class="gloss-search">' +
+          '<input type="text" class="gloss-search-input" id="gloss-filter" ' +
+            'placeholder="Filter terms\u2026  (e.g. InfoNCE, partition, MSVtx)" ' +
+            'autocomplete="off" spellcheck="false" aria-label="Filter glossary terms">' +
+          '<span class="gloss-search-count" id="gloss-count"></span>' +
+        '</div>' +
+        '<div class="gloss-results" id="gloss-results"></div>';
+
+      var results = el.querySelector("#gloss-results");
+      var countEl = el.querySelector("#gloss-count");
+      var input   = el.querySelector("#gloss-filter");
+
+      /* build grouped tables once; rows carry a searchable haystack */
       var html = "";
       cats.forEach(function (cat) {
         var group = terms.filter(function (t) { return (t.cat || "Other") === cat; })
                          .sort(function (a, b) { return a.term.localeCompare(b.term); });
         if (!group.length) return;
+        html += '<div class="gloss-group" data-cat="' + esc(cat) + '">';
         html += '<h3 class="gloss-cat">' + esc(cat) + "</h3>";
         html += '<table class="gloss-table"><tbody>';
         group.forEach(function (t) {
+          var hay = [t.term, t.cat, t.def, t.gloss, t.id]
+            .join(" ").toLowerCase();
           html +=
-            '<tr id="term-' + esc(t.id) + '">' +
+            '<tr id="term-' + esc(t.id) + '" class="gloss-row" data-search="' + esc(hay) + '">' +
               '<th class="gloss-term">' + esc(t.term) + "</th>" +
               '<td class="gloss-def">' + esc(t.def || t.gloss || "") + "</td>" +
             "</tr>";
         });
-        html += "</tbody></table>";
+        html += "</tbody></table></div>";
       });
-      el.innerHTML = html;
+      results.innerHTML = html;
+
+      var groups = [].slice.call(results.querySelectorAll(".gloss-group"));
+      var empty  = null;
+
+      function applyFilter(q) {
+        q = (q || "").trim().toLowerCase();
+        var shown = 0;
+        groups.forEach(function (g) {
+          var groupShown = 0;
+          [].forEach.call(g.querySelectorAll(".gloss-row"), function (r) {
+            var match = !q || r.getAttribute("data-search").indexOf(q) !== -1;
+            r.style.display = match ? "" : "none";
+            if (match) { shown++; groupShown++; }
+          });
+          g.style.display = groupShown ? "" : "none";
+        });
+
+        countEl.textContent = q ? (shown + " / " + total + " terms")
+                                : (total + " terms");
+
+        if (!shown) {
+          if (!empty) {
+            empty = document.createElement("p");
+            empty.className = "gloss-empty";
+            results.appendChild(empty);
+          }
+          empty.textContent = "No terms match \u201C" + q + "\u201D.";
+          empty.style.display = "";
+        } else if (empty) {
+          empty.style.display = "none";
+        }
+      }
+
+      input.addEventListener("input", function () { applyFilter(input.value); });
+      input.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && input.value) { input.value = ""; applyFilter(""); }
+      });
+
+      applyFilter("");
     });
   }
 
