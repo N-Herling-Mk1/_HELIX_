@@ -132,6 +132,24 @@ const HELIX_SECTORS = [
       },
       {
         "status": "reference",
+        "id": "h-r-09",
+        "docKey": "abcdiscotec2025",
+        "title": "Machine Learning Method for Enforcing Variable Independence in Background Estimation with LHC Data: ABCDisCoTEC",
+        "authors": "CMS Collaboration",
+        "year": 2025,
+        "tags": [
+          "ABCD",
+          "DISCO",
+          "CLOSURE",
+          "MDMM"
+        ],
+        "venue": "Mach. Learn.: Sci. Technol. (submitted) · CMS-MLG-23-003 · arXiv:2506.08826",
+        "abstract": "CMS successor to ABCDisCo. Minimizing distance correlation alone can distort the discriminant shapes enough to break the background prediction, so ABCDisCoTEC adds a differentiable nonclosure loss that targets ABCD closure directly and balances the competing terms with the modified differential method of multipliers (MDMM) — steadier than grid-search hyperparameter scans. Demonstrated on 13 TeV proton-proton collisions at CMS. A concrete template for the ABCD-closure quality term in HELIXs RRM penalty extension.",
+        "url": "https://arxiv.org/abs/2506.08826",
+        "pdf": "https://arxiv.org/pdf/2506.08826"
+      },
+      {
+        "status": "reference",
         "id": "h-r-08",
         "docKey": "cwola2017",
         "title": "Classification Without Labels: Learning from Mixed Samples in High Energy Physics (CWoLa)",
