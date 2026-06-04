@@ -1324,17 +1324,6 @@ if (document.fonts && document.fonts.ready){
 <script>
 (function(){
   "use strict";
-
-  /* ╔══════════════════════════════════════════════════════════════╗
-     ║  A/B TEST SWITCH                                               ║
-     ║  false → warmer OFF (cold: app.html loads only AFTER ENTER —   ║
-     ║          this is the "before" baseline for the comparison)    ║
-     ║  true  → warmer ON  (prerender/prefetch during the splash —   ║
-     ║          the normal, shipping behavior)                       ║
-     ║  Flip this one value back to true after the test.             ║
-     ╚══════════════════════════════════════════════════════════════╝ */
-  var WARM_ENABLED = false;
-
   var fired = false;
 
   // Everything app.html needs on first paint + its default view (research/traditional).
@@ -1380,7 +1369,6 @@ if (document.fonts && document.fonts.ready){
   }
 
   function warm(){
-    if (!WARM_ENABLED) return;   // A/B test: off → no prerender, no prefetch
     if (fired) return; fired = true;
     var run = supportsSpeculation() ? injectPrerender : injectPrefetch;
     if (window.requestIdleCallback) requestIdleCallback(run, { timeout: 1500 });
