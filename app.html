@@ -21,6 +21,21 @@
 <link rel="stylesheet" href="css/core.css">
 <link rel="stylesheet" href="css/shell.css">
 <link rel="stylesheet" href="help/css/help.css">
+<!-- GoatCounter — async load, fire only after full page load (non-blocking) -->
+<script>window.goatcounter = { no_onload: true };</script>
+<script data-goatcounter="https://helix-nherling.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+<script>
+  window.addEventListener('load', function () {
+    (function fire() {
+      if (window.goatcounter && typeof window.goatcounter.count === 'function') {
+        window.goatcounter.count();
+      } else {
+        setTimeout(fire, 200);  // count.js still arriving — retry quietly
+      }
+    })();
+  });
+</script>
 </head>
 <body>
 <div class="grid-bg"></div>

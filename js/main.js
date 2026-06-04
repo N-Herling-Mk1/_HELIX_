@@ -11,10 +11,20 @@
   // it as a static file) and on GitHub Pages (committed manifest is served
   // directly). Non-blocking — if it fails, we just keep whatever articles.js
   // already has.
+  // Anchor the manifest path to main.js's own location (.../js/), NOT the
+  // embedding document. main.js is loaded from inside views/*.html via an
+  // iframe, so a bare relative path resolves against views/ and 404s.
+  // Resolving against the script's own URL works from any page and avoids
+  // the GitHub Pages project-subpath trap (can't use a root-absolute /assets).
+  const _self = (document.currentScript && document.currentScript.src) || '';
+  const MANIFEST_URL = _self
+    ? new URL('../assets/bulk_db/manifest.json', _self).href
+    : 'assets/bulk_db/manifest.json';
+
   let manifestLoaded = false;
   async function loadManifest() {
     try {
-      const r = await fetch('assets/bulk_db/manifest.json?t=' + Date.now());
+      const r = await fetch(MANIFEST_URL + '?t=' + Date.now());
       if (!r.ok) return;
       const m = await r.json();
       mergeManifestIntoSectors(m.components || []);
