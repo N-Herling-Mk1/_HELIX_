@@ -388,6 +388,22 @@ const HELIX_SECTORS = [
         "abstract": "Applies contrastive self-supervision to jet physics, learning permutation-invariant representations of jet constituents with a transformer and physically-motivated augmentations, evaluated by linear probe. It is the existence proof that event-level contrastive representations transfer to detector data, setting the yardstick for HELIXs Evt2Vec → CutFormer.",
         "url": "https://doi.org/10.21468/SciPostPhys.12.6.188",
         "pdf": "https://arxiv.org/pdf/2108.04253"
+      },
+      {
+        "id": "l-r-06",
+        "docKey": "gorishniy2022",
+        "title": "On Embeddings for Numerical Features in Tabular Deep Learning",
+        "authors": "Y. Gorishniy, I. Rubachev & A. Babenko",
+        "year": 2022,
+        "tags": [
+          "NUMERICAL-EMBEDDINGS",
+          "BINNING",
+          "TABULAR-DL"
+        ],
+        "venue": "NeurIPS 2022 · arXiv:2203.05556",
+        "abstract": "Shows that mapping scalar numerical features into high-dimensional embeddings — via piecewise-linear encoding over learned bins (quantile or target-aware) or periodic activations — significantly lifts tabular deep nets, letting MLPs and transformers rival gradient-boosted trees on GBDT-friendly benchmarks. Establishes feature binning as a principled, performant discretization step ahead of the backbone. The tabular warrant for HELIXs “numbers as tokens”: detector features in a flat CSV, binned into a vocabulary, lose little separation when the binning is done right — exactly what the Discretization Sanity gate confirms in-domain.",
+        "url": "https://arxiv.org/abs/2203.05556",
+        "pdf": "https://arxiv.org/pdf/2203.05556"
       }
     ],
     "notes": [
@@ -582,6 +598,22 @@ const HELIX_SECTORS = [
         "url": "https://arxiv.org/abs/2603.20179",
         "pdf": "https://arxiv.org/pdf/2603.20179",
         "status": "reference"
+      },
+      {
+        "id": "x-r-03",
+        "docKey": "janner2021",
+        "title": "Offline Reinforcement Learning as One Big Sequence Modeling Problem",
+        "authors": "M. Janner, Q. Li & S. Levine",
+        "year": 2021,
+        "tags": [
+          "TRAJECTORY-TRANSFORMER",
+          "SEQUENCE-MODELING",
+          "DISCRETIZATION"
+        ],
+        "venue": "NeurIPS 2021 · arXiv:2106.02039",
+        "abstract": "Recasts offline RL as autoregressive sequence modeling: each continuous state/action dimension is discretized independently into tokens and modeled by a GPT-style Transformer, with beam search repurposed as the planner. Demonstrates that per-dimension tokenization of continuous physical quantities is expressive enough to model whole trajectories, and that quantile discretization keeps every token populated in the data. The sequence-model precedent for CutFormer — detector features read as an ordered token stream — and prior validation of HELIXs quantile-binning and bin-occupancy choices.",
+        "url": "https://arxiv.org/abs/2106.02039",
+        "pdf": "https://arxiv.org/pdf/2106.02039"
       }
     ],
     "notes": [

@@ -1,9 +1,10 @@
 {
-  "_comment": "HELIX bibliography. Inline <cite data-ref=\"KEY\"></cite> tags in any panel auto-number by this array's order and link to the References panel. APPEND-ONLY: add new entries at the end so existing citation numbers never shift. Each entry: id (the data-ref key), authors, year, title, venue, links[].",
-  "last_updated": "2026-05-31",
+  "_comment": "HELIX bibliography. Inline <cite data-ref=\"KEY\"></cite> tags in any panel auto-number by this array's order and link to the References panel. APPEND-ONLY: add new entries at the end so existing citation numbers never shift. Each entry: id (the data-ref key), authors, year, title, venue, links[]. Each entry also carries a 'sector' — one of H/E/L/I/X (HEP, Epistemic, Learning, Information theory, eXploration) — mapping the citation to the HELIX pillar it supports.",
+  "last_updated": "2026-06-08",
   "refs": [
     {
       "id": "jaynes1957",
+      "sector": "I",
       "authors": "E. T. Jaynes",
       "year": 1957,
       "title": "Information Theory and Statistical Mechanics",
@@ -17,6 +18,7 @@
     },
     {
       "id": "stone2019",
+      "sector": "I",
       "authors": "J. V. Stone",
       "year": 2019,
       "title": "Information Theory: A Tutorial Introduction",
@@ -30,6 +32,7 @@
     },
     {
       "id": "kuntz2024",
+      "sector": "E",
       "authors": "R. M. Kuntz, H. von Campe, T. Röspel, M. P. Herzog & B. M. Schäfer",
       "year": 2024,
       "title": "Partition Function Approach to Non-Gaussian Likelihoods: Information Theory and State Variables for Bayesian Inference",
@@ -43,6 +46,7 @@
     },
     {
       "id": "rospel2025",
+      "sector": "E",
       "authors": "T. Röspel, A. Schlosser & B. M. Schäfer",
       "year": 2025,
       "title": "Approximating Non-Gaussian Bayesian Partitions with Normalising Flows: Statistics, Inference and Application to Cosmology",
@@ -56,6 +60,7 @@
     },
     {
       "id": "caliskan2017",
+      "sector": "L",
       "authors": "A. Caliskan, J. J. Bryson & A. Narayanan",
       "year": 2017,
       "title": "Semantics Derived Automatically from Language Corpora Contain Human-like Biases",
@@ -73,6 +78,7 @@
     },
     {
       "id": "mikolov2013",
+      "sector": "L",
       "authors": "T. Mikolov, K. Chen, G. Corrado & J. Dean",
       "year": 2013,
       "title": "Efficient Estimation of Word Representations in Vector Space",
@@ -86,6 +92,7 @@
     },
     {
       "id": "oord2018",
+      "sector": "I",
       "authors": "A. van den Oord, Y. Li & O. Vinyals",
       "year": 2018,
       "title": "Representation Learning with Contrastive Predictive Coding",
@@ -99,6 +106,7 @@
     },
     {
       "id": "simclr2020",
+      "sector": "L",
       "authors": "T. Chen, S. Kornblith, M. Norouzi & G. Hinton",
       "year": 2020,
       "title": "A Simple Framework for Contrastive Learning of Visual Representations (SimCLR)",
@@ -112,6 +120,7 @@
     },
     {
       "id": "jetclr2022",
+      "sector": "H",
       "authors": "B. M. Dillon, G. Kasieczka, H. Olischläger, T. Plehn, P. Sorrenson & L. Vogel",
       "year": 2022,
       "title": "Symmetries, Safety, and Self-Supervision (JetCLR)",
@@ -129,6 +138,7 @@
     },
     {
       "id": "gn2_2026",
+      "sector": "H",
       "authors": "ATLAS Collaboration",
       "year": 2026,
       "title": "Transforming Jet Flavour Tagging at ATLAS (GN2)",
@@ -146,6 +156,7 @@
     },
     {
       "id": "abcddisco2021",
+      "sector": "H",
       "authors": "G. Kasieczka, B. Nachman, M. D. Schwartz & D. Shih",
       "year": 2021,
       "title": "ABCDisCo: Automating the ABCD Method with Machine Learning",
@@ -163,6 +174,7 @@
     },
     {
       "id": "cwola2017",
+      "sector": "H",
       "authors": "E. M. Metodiev, B. Nachman & J. Thaler",
       "year": 2017,
       "title": "Classification Without Labels: Learning from Mixed Samples in High Energy Physics (CWoLa)",
@@ -180,6 +192,7 @@
     },
     {
       "id": "gal2016",
+      "sector": "E",
       "authors": "Y. Gal & Z. Ghahramani",
       "year": 2016,
       "title": "Dropout as a Bayesian Approximation: Representing Model Uncertainty in Deep Learning",
@@ -188,6 +201,34 @@
         {
           "label": "arXiv:1506.02142",
           "url": "https://arxiv.org/abs/1506.02142"
+        }
+      ]
+    },
+    {
+      "id": "gorishniy2022",
+      "sector": "L",
+      "authors": "Y. Gorishniy, I. Rubachev & A. Babenko",
+      "year": 2022,
+      "title": "On Embeddings for Numerical Features in Tabular Deep Learning",
+      "venue": "Advances in Neural Information Processing Systems 35 (NeurIPS)",
+      "links": [
+        {
+          "label": "arXiv:2203.05556",
+          "url": "https://arxiv.org/abs/2203.05556"
+        }
+      ]
+    },
+    {
+      "id": "janner2021",
+      "sector": "X",
+      "authors": "M. Janner, Q. Li & S. Levine",
+      "year": 2021,
+      "title": "Offline Reinforcement Learning as One Big Sequence Modeling Problem",
+      "venue": "Advances in Neural Information Processing Systems 34 (NeurIPS)",
+      "links": [
+        {
+          "label": "arXiv:2106.02039",
+          "url": "https://arxiv.org/abs/2106.02039"
         }
       ]
     }

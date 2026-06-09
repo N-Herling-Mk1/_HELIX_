@@ -1,6 +1,6 @@
 {
   "_comment": "HELIX glossary. Inline <dfn data-term=\"KEY\">...</dfn> tags open a modal with the term's definition; the Glossary panel renders the full table. APPEND new terms anywhere — order within a category is alphabetical by convention but not required. Each entry: id (the data-term key), term (display), cat (category for table grouping), gloss (one-line, for tooltip/modal header), def (fuller, for the table).",
-  "last_updated": "2026-05-31",
+  "last_updated": "2026-06-08",
   "categories": ["Architecture", "Information theory", "Statistics & Bayesian", "NLP", "Physics & ATLAS"],
   "terms": [
     {
@@ -152,6 +152,56 @@
       "id": "neff", "term": "Effective dimension (n_eff)", "cat": "Statistics & Bayesian",
       "gloss": "Temperature-dependent measure of model complexity from the Bayes-partition formalism; n_eff ≤ n.",
       "def": "A temperature-dependent complexity measure from the Bayes-partition formalism (Kuntz et al., 2024), defined via the heat-capacity analogue. n_eff ≤ n, shrinking as higher-order (non-Gaussian) correlations appear — a diagnostic of how many degrees of freedom a model genuinely uses."
+    },
+    {
+      "id": "entropy", "term": "Shannon entropy H(x)", "cat": "Information theory",
+      "gloss": "Average surprisal of a variable; its irreducible uncertainty, in bits.",
+      "def": "H(x) = Σ p(x_i) log(1/p(x_i)). The mean Shannon information (surprisal) over a variable's outcomes. On detector data it is the MaxEnt floor H(p_k): the uncertainty a model is entitled to at a given cut stage and no less."
+    },
+    {
+      "id": "differential-entropy", "term": "Differential entropy", "cat": "Information theory",
+      "gloss": "Continuous analogue of entropy; meaningful only through differences.",
+      "def": "H(x) = ∫ p(x) log(1/p(x)) dx. The continuous-variable version of entropy (eq 32). Its absolute value is reference-dependent and formally infinite, so it is used only via differences such as mutual information — which is why MI, not raw entropy, is the safe quantity for continuous observables (displacement, mass, pT)."
+    },
+    {
+      "id": "joint-entropy", "term": "Joint entropy H(x,y)", "cat": "Information theory",
+      "gloss": "Total uncertainty of a pair of variables taken together.",
+      "def": "H(x,y), the uncertainty of the joint (input, output) system. Decomposes as H(x,y) = I(x,y) + H(x|y) + H(y|x): shared information plus the two residual uncertainties (eq 35)."
+    },
+    {
+      "id": "conditional-entropy", "term": "Conditional entropy H(y|x)", "cat": "Information theory",
+      "gloss": "Residual uncertainty in y once x is known; for a detector, the resolution entropy.",
+      "def": "H(y|x): uncertainty remaining in the output once the input is known. In the detector-as-channel picture this equals the noise entropy H(η) — the resolution / smearing introduced by reconstruction (eq 36)."
+    },
+    {
+      "id": "equivocation", "term": "Equivocation H(x|y)", "cat": "Information theory",
+      "gloss": "Uncertainty about the truth that remains after the measurement is seen.",
+      "def": "H(x|y): the uncertainty about the input (truth) left after observing the output (reconstructed event). It is the quantity that caps unfolding and truth inference — large equivocation means no procedure recovers truth cleanly, a fact about the data rather than the algorithm."
+    },
+    {
+      "id": "mutual-information", "term": "Mutual information I(x,y)", "cat": "Information theory",
+      "gloss": "Shared information between two variables; model-independent discriminating power.",
+      "def": "I(x,y) = H(x) − H(x|y) = H(y) − H(y|x), equal to the KL divergence between the joint and the product of marginals (eq 46). On detector data, I(feature; label) is the model-independent separating power of a variable: it upper-bounds any classifier built on that feature, so it ranks cut variables without committing to an architecture."
+    },
+    {
+      "id": "relative-entropy", "term": "Relative entropy (KL divergence)", "cat": "Information theory",
+      "gloss": "Information cost of using distribution q in place of the true p.",
+      "def": "D_KL(p‖q) = Σ p log(p/q): the expected extra surprisal from modelling p with q. Mutual information is the special case D_KL(joint ‖ product of marginals), which is the bridge from information theory to the pyhf likelihood."
+    },
+    {
+      "id": "channel-capacity", "term": "Channel capacity C", "cat": "Information theory",
+      "gloss": "Maximum information a channel can carry per use; the ceiling on detector sensitivity.",
+      "def": "C = max over input distributions p(x) of I(x,y) (eq 53). The most information about the underlying physics the detector can deliver per event; it is the hard upstream ceiling on how well any analysis can separate hypotheses (and thus on CLs reach). Gaussian limit: C = ½ log(1 + S/N) (eq 54)."
+    },
+    {
+      "id": "noisy-channel", "term": "Noisy channel (detector)", "cat": "Information theory",
+      "gloss": "The model y = x + η: truth in, reconstructed event out, detector response as noise.",
+      "def": "Shannon's channel y = x + η read onto a detector: truth-level event x is the transmitted message, the reconstructed event y is what is received, and the detector response (resolution, efficiency, fakes, pileup) is the noise η. In general the response is a migration kernel R(y|x) — not additive and not Gaussian — so the discrete entropy/MI equations apply, with the Gaussian channel as a special case."
+    },
+    {
+      "id": "data-processing-inequality", "term": "Data-processing inequality (DPI)", "cat": "Information theory",
+      "gloss": "Information cannot increase along a processing chain.",
+      "def": "For a chain truth → hits → reco → cut variables → NN score → decision, mutual information is non-increasing: I(truth;score) ≤ I(truth;reco) ≤ I(truth;hits). No downstream stage can recover information an upstream stage discarded; computing MI per stage locates where sensitivity leaks."
     }
   ]
 }

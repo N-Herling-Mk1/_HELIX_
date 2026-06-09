@@ -49,6 +49,18 @@
         if (rh) HelixRefs.renderList(rh);            // draw the bibliography
       }
     }
+    if (window.renderMathInElement){
+      renderMathInElement(host, {                     // KaTeX: typeset injected panel math
+        delimiters: [
+          { left: "$$", right: "$$", display: true  },
+          { left: "\\[", right: "\\]", display: true  },
+          { left: "\\(", right: "\\)", display: false },
+          { left: "$",  right: "$",  display: false }
+        ],
+        throwOnError: false,
+        ignoredTags: ["script","noscript","style","textarea","pre","code"]
+      });
+    }
   }
 
   async function load(id, push){

@@ -1,0 +1,311 @@
+<div class="it">
+
+<!-- panel-scoped styling · FORGE light surface · leaks nothing outside .it -->
+<style>
+  .it .it-frame{
+    display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:52px;align-items:start;margin:26px 0 4px;
+  }
+  .it .it-frame .doc-p:first-child{margin-top:0;}
+  @media (max-width:920px){ .it .it-frame{grid-template-columns:1fr;gap:26px;} }
+
+  /* display-equation card: centered math + right-aligned equation number */
+  .it .it-eqn{
+    position:relative;margin:20px 0;padding:14px 56px 14px 22px;
+    background:var(--doc-bg-alt);border:1px solid var(--doc-line);
+    border-left:3px solid var(--acc-orange);border-radius:6px;overflow-x:auto;
+  }
+  .it .it-eqn .katex-display{margin:0;}
+  .it .it-eqn-n{
+    position:absolute;right:16px;top:50%;transform:translateY(-50%);
+    font-family:'Share Tech Mono',monospace;font-size:12px;color:var(--acc-cyan);opacity:.85;
+  }
+  .it .it-eqn.bare{background:transparent;border:0;border-left:0;padding:8px 0;}
+
+  /* small caption under figures / equations */
+  .it .it-cap{font-family:'Share Tech Mono',monospace;font-size:12px;line-height:1.6;
+    color:var(--doc-ink-faint);margin:6px 0 0;letter-spacing:.01em;}
+
+  /* channel diagram wrapper */
+  .it .it-chan{margin:22px 0 6px;padding:18px 20px;background:#fff;border:1px solid var(--doc-line);border-radius:8px;}
+  .it .it-chan svg{display:block;width:100%;height:auto;}
+
+  /* sticky aside (mirrors .doc-aside) */
+  .it .it-aside{position:sticky;top:0;border:1px solid var(--doc-line);border-left:3px solid var(--acc-orange);
+    border-radius:6px;background:var(--doc-bg-alt);padding:18px 20px;font-size:14px;line-height:1.6;color:var(--doc-ink-soft);}
+  .it .it-aside .ag-kicker{font-family:'Share Tech Mono',monospace;font-size:9.5px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--acc-orange);font-weight:600;margin:0 0 12px;}
+  .it .it-aside b{color:var(--doc-ink);}
+  .it .it-aside ul{margin:8px 0 0;padding-left:0;list-style:none;}
+  .it .it-aside li{margin:9px 0;padding-left:14px;position:relative;}
+  .it .it-aside li::before{content:'';position:absolute;left:0;top:9px;width:5px;height:5px;
+    background:var(--acc-cyan);transform:rotate(45deg);}
+
+  /* mapping table: equation → detector meaning */
+  .it .it-map{width:100%;border-collapse:collapse;margin:18px 0 4px;font-size:15px;}
+  .it .it-map th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--acc-orange);border-bottom:2px solid var(--doc-line);padding:0 14px 9px;}
+  .it .it-map td{vertical-align:top;padding:11px 14px;border-bottom:1px solid var(--doc-line-soft);
+    color:var(--doc-ink-soft);line-height:1.55;}
+  .it .it-map td:first-child{white-space:nowrap;color:var(--doc-ink);}
+  .it .it-map tr:hover td{background:var(--doc-bg-muted);}
+</style>
+
+<div class="kicker"><span class="bar"></span>02 · Detector &harr; Information Theory</div>
+<h2 class="doc-h2">Mapping Detector Data to Information Theory</h2>
+
+<p class="lead">Shannon's <i>Key Equations</i> <cite data-ref="stone2019"></cite> were written for the channel
+  $y = x + \eta$. A detector <i>is</i> that channel. Once the truth-level event is read as the transmitted
+  message and the reconstructed event as the received one, the entropy / mutual-information / capacity
+  machinery stops being abstract and becomes a set of statements about what an analysis can and cannot know &mdash;
+  the same <dfn data-term="jaynes">maximum-entropy</dfn> spine the rest of HELIX hangs on.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ THE FRAME ════════════════ -->
+<div class="it-frame">
+<div class="it-main">
+
+<h3 class="doc-h3">The detector is a noisy channel</h3>
+
+<p class="doc-p">Identify the truth-level (particle / parton) event with the channel input $x$, the reconstructed
+  event with the output $y$, and the detector response &mdash; resolution smearing, efficiency loss, fakes, pileup &mdash;
+  with the channel noise $\eta$:</p>
+
+<div class="it-chan">
+<svg viewBox="0 0 720 150" xmlns="http://www.w3.org/2000/svg" font-family="'Share Tech Mono',monospace">
+  <defs>
+    <marker id="itarr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#16202e"/>
+    </marker>
+  </defs>
+  <!-- input -->
+  <rect x="14" y="48" width="150" height="54" rx="6" fill="#eaf6fa" stroke="#00b3cc" stroke-width="1.5"/>
+  <text x="89" y="71" text-anchor="middle" font-size="15" fill="#16202e">truth event</text>
+  <text x="89" y="90" text-anchor="middle" font-size="15" fill="#0096b5">x</text>
+  <!-- channel -->
+  <rect x="285" y="40" width="160" height="70" rx="6" fill="#fff" stroke="#16202e" stroke-width="1.6"/>
+  <text x="365" y="66" text-anchor="middle" font-size="14" fill="#16202e">DETECTOR</text>
+  <text x="365" y="88" text-anchor="middle" font-size="13" fill="#0096b5">R(y | x)</text>
+  <!-- noise -->
+  <text x="365" y="24" text-anchor="middle" font-size="13" fill="#ff6a00">noise &#951; &#8594; resolution, fakes, pileup</text>
+  <line x1="365" y1="30" x2="365" y2="38" stroke="#ff6a00" stroke-width="1.5" marker-end="url(#itarr)"/>
+  <!-- output -->
+  <rect x="556" y="48" width="150" height="54" rx="6" fill="#eaf6fa" stroke="#00b3cc" stroke-width="1.5"/>
+  <text x="631" y="71" text-anchor="middle" font-size="15" fill="#16202e">reco event</text>
+  <text x="631" y="90" text-anchor="middle" font-size="15" fill="#0096b5">y</text>
+  <!-- wires -->
+  <line x1="164" y1="75" x2="283" y2="75" stroke="#16202e" stroke-width="1.6" marker-end="url(#itarr)"/>
+  <line x1="445" y1="75" x2="554" y2="75" stroke="#16202e" stroke-width="1.6" marker-end="url(#itarr)"/>
+  <text x="224" y="66" text-anchor="middle" font-size="12" fill="#6a7888">H(x)</text>
+  <text x="500" y="66" text-anchor="middle" font-size="12" fill="#6a7888">H(y)</text>
+</svg>
+</div>
+
+<p class="doc-p"><b>One caveat up front.</b> The detector response is a migration / smearing kernel $R(y\mid x)$ &mdash;
+  generally <i>not</i> additive and <i>not</i> Gaussian. So the <i>discrete</i> equations below (31, 33, 36, 46)
+  are load-bearing; the additive-Gaussian results (52, 54) are a clean special case (good resolution, a
+  well-measured continuous observable), not the general law.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ ENTROPY ════════════════ -->
+<h3 class="doc-h3">Entropy &amp; surprisal &mdash; eq 31, 32</h3>
+
+<div class="it-eqn">
+  $$H(x)=\sum_{i=1}^{m} p(x_i)\,\log\frac{1}{p(x_i)}\ \text{bits}$$
+  <span class="it-eqn-n">(31)</span>
+</div>
+
+<p class="doc-p">Shannon entropy <cite data-ref="stone2019"></cite> is the <dfn data-term="maxent-floor">MaxEnt floor</dfn>
+  $H(p_k)$ made literal. At cut stage $k$, $p_k$ is the background distribution over the discriminant given only the
+  constraints known at that stage, and its entropy is the irreducible uncertainty <dfn data-term="jaynes">Jaynes</dfn>
+  <cite data-ref="jaynes1957"></cite> says we are entitled to &mdash; and no less. The continuous form (32) is the one
+  for displacement, $m_S$, $p_T$: differential entropy of a feature density.</p>
+
+<p class="doc-p">Keep two uses distinct: (i) $H(p_k)$ over the <i>background ensemble</i> is the physics-derived bound;
+  (ii) the <dfn data-term="epistemic">predictive entropy</dfn> of a classifier's $p(y\mid x)$ is the model's
+  <i>reported</i> uncertainty. The HELIX epistemic-floor claim is precisely that (ii) must not fall below (i):</p>
+
+<div class="it-eqn">
+  $$H_{\text{model}}\big(p(y\mid x)\big)\ \ge\ H(p_k)$$
+  <span class="it-eqn-n">floor</span>
+</div>
+
+<p class="doc-p">A <dfn data-term="bll">Bayesian-last-layer</dfn> posterior whose predictive entropy drops below the physics
+  floor is overconfident <i>by construction</i>, not by bad luck.</p>
+
+<p class="doc-p"><b>The surprisal is the background handle.</b> The integrand of (31), taken per event under the
+  <i>background</i> model, is the <dfn data-term="surprise-score">surprise score</dfn>:</p>
+
+<div class="it-eqn">
+  $$S(x) = -\log p_{\mathrm{bg}}(x)$$
+  <span class="it-eqn-n">(surprisal)</span>
+</div>
+
+<p class="doc-p">High surprisal = anomalous = signal-like. The <dfn data-term="abcd">ABCD method</dfn>
+  <cite data-ref="abcddisco2021"></cite> is, in this language, a structured estimator of $p_{\mathrm{bg}}$ in the
+  signal region; the surprisal is the anomaly score read off it &mdash; and it needs no signal MC
+  <cite data-ref="cwola2017"></cite>.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ JOINT / CONDITIONAL ════════════════ -->
+<h3 class="doc-h3">Joint &amp; conditional entropy &mdash; eq 33&ndash;43</h3>
+
+<p class="doc-p">Set $x$ = truth, $y$ = reconstructed observable. Then the conditional entropies split the uncertainty
+  cleanly. The detector resolution <i>is</i> the noise entropy:</p>
+
+<div class="it-eqn">
+  $$H(y\mid x) = H(\eta)\qquad\text{(detector resolution / smearing)}$$
+  <span class="it-eqn-n">(36)</span>
+</div>
+
+<p class="doc-p">The reverse conditional is the <dfn data-term="equivocation">equivocation</dfn> &mdash; residual uncertainty
+  about truth <i>given</i> the measurement, $H(x\mid y)$ &mdash; and it is what actually caps unfolding. Large
+  $H(x\mid y)$ means no procedure recovers truth cleanly; that is a fact about the data, not the algorithm. The
+  total joint uncertainty decomposes (eq 35) and obeys the chain rule (eq 42):</p>
+
+<div class="it-eqn">
+  $$H(x,y)=I(x,y)+H(x\mid y)+H(y\mid x),\qquad H(x,y)=H(x)+H(y\mid x)$$
+  <span class="it-eqn-n">(35, 42)</span>
+</div>
+
+<p class="doc-p">Marginalisation (eq 44&ndash;45) is then just forward-folding ($p(y)=\sum_x p(x,y)$, a truth spectrum pushed
+  through the response), its inverse (unfolding), and integrating out $\eta$ / nuisances.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ MUTUAL INFORMATION ════════════════ -->
+<h3 class="doc-h3">Mutual information &mdash; eq 46&ndash;51</h3>
+
+<p class="doc-p">The most useful group. Note that mutual information <i>is</i> a relative entropy &mdash; the
+  <dfn data-term="relative-entropy">KL</dfn> divergence between the joint and the product of marginals &mdash; which is the
+  bridge to the pyhf likelihood:</p>
+
+<div class="it-eqn">
+  $$I(x,y)=\sum_{i,j} p(x_i,y_j)\,\log\frac{p(x_i,y_j)}{p(x_i)\,p(y_j)}
+          \;=\; D_{\mathrm{KL}}\!\big(p(x,y)\,\big\|\,p(x)\,p(y)\big)$$
+  <span class="it-eqn-n">(46)</span>
+</div>
+
+<p class="doc-p">Read against detector data, $I(\text{feature};\text{label})$ is the <i>model-independent</i> discriminating
+  power of a variable: it upper-bounds the separation any classifier built on that feature can reach, so it ranks cut
+  variables without committing to an architecture. $I(\text{embedding};\text{physical quantity})$ is exactly the
+  <dfn data-term="wefat">WEFAT</dfn> probe &mdash; "does <dfn data-term="evt2vec">Evt2Vec</dfn> encode displacement or
+  mass point" is an MI question, and a linear-probe AUC is a (loose) lower bound on it. The identities</p>
+
+<div class="it-eqn">
+  $$I(x,y)=H(x)-H(x\mid y)=H(y)-H(y\mid x)$$
+  <span class="it-eqn-n">(49, 50)</span>
+</div>
+
+<p class="doc-p">say information gained = output entropy minus noise.</p>
+
+<p class="doc-p"><b>The data-processing inequality is the ceiling on the pipeline.</b> The analysis is a <i>cascade</i> of
+  channels &mdash; truth &rarr; hits &rarr; reco objects &rarr; cut variables &rarr; NN score &rarr; decision &mdash; and
+  MI is non-increasing down the chain:</p>
+
+<div class="it-eqn">
+  $$I(\text{truth};\text{score})\ \le\ I(\text{truth};\text{reco})\ \le\ I(\text{truth};\text{hits})$$
+  <span class="it-eqn-n">(DPI)</span>
+</div>
+
+<p class="doc-p">You can never recover information a stage discarded. This is the rigorous form of "the mk3/mk4
+  <dfn data-term="cutflow">cutflow</dfn> MLP cannot beat what was thrown away upstream" &mdash; and it tells you
+  <i>where</i> you are bleeding: compute MI at each stage, find the biggest drop. $H(p_k)$ is the local MaxEnt floor
+  at each link.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ CAPACITY ════════════════ -->
+<h3 class="doc-h3">Channel capacity &mdash; eq 53, 54</h3>
+
+<div class="it-eqn">
+  $$C=\max_{p(x)} I(x,y)\ \ \text{bits/event}$$
+  <span class="it-eqn-n">(53)</span>
+</div>
+
+<p class="doc-p">Capacity is the <b>ceiling on sensitivity</b>: the most information about the underlying physics the detector
+  can deliver per event, maximised over the truth distribution one could feed it. For an
+  <dfn data-term="llp">LLP</dfn> search reduced to a presence / absence bit, $C$ bounds how well any analysis can
+  separate hypotheses &mdash; the upstream limit on CLs reach. The Gaussian form is the clean limit for a
+  well-measured continuous observable, with $S/N$ either resolution SNR or, in a counting region, signal-over-background:</p>
+
+<div class="it-eqn">
+  $$C=\tfrac12\,\log\!\left(1+\frac{S}{N}\right)$$
+  <span class="it-eqn-n">(54)</span>
+</div>
+
+<p class="doc-p">Note its brutal logarithmic stinginess &mdash; doubling $S/N$ buys well under a bit. Sensitivity is bought in
+  $\log$, paid for in luminosity.</p>
+
+<div class="rule"></div>
+
+<!-- ════════════════ GAUSSIAN / FOURIER ════════════════ -->
+<h3 class="doc-h3">Gaussian / Fourier channel &mdash; eq 52</h3>
+
+<p class="doc-p">Less central to event-level analysis, but the honest model for the <i>other</i> hat &mdash; detector front-end
+  electronics, DCS / WinCC&nbsp;OA telemetry streams, RF instrumentation. Over bandwidth $W$ with per-frequency
+  $S(f)/N(f)$:</p>
+
+<div class="it-eqn">
+  $$C=\int_{0}^{W}\log\!\left(1+\frac{S(f)}{N(f)}\right)df\ \ \text{bits/s}\qquad(\text{Nyquist } 2W)$$
+  <span class="it-eqn-n">(52)</span>
+</div>
+
+<div class="rule"></div>
+
+<!-- ════════════════ MAPPING TABLE ════════════════ -->
+<h3 class="doc-h3">Equation &rarr; detector meaning</h3>
+
+<table class="it-map">
+  <thead><tr><th>Quantity</th><th>On detector data</th></tr></thead>
+  <tbody>
+    <tr><td>$H(x)$ &nbsp;(31)</td><td>MaxEnt floor $H(p_k)$ at a cut stage; irreducible uncertainty.</td></tr>
+    <tr><td>$-\log p_{\mathrm{bg}}(x)$</td><td>Per-event surprisal &mdash; the background / anomaly handle.</td></tr>
+    <tr><td>$H(y\mid x)$ &nbsp;(36)</td><td>Detector resolution entropy $=H(\eta)$; pure instrument.</td></tr>
+    <tr><td>$H(x\mid y)$ &nbsp;(38)</td><td>Equivocation; caps unfolding / truth inference.</td></tr>
+    <tr><td>$I(\text{feat};\,\text{label})$</td><td>Model-independent discriminating power; cut-variable ranking.</td></tr>
+    <tr><td>$I(\text{emb};\,q)$</td><td>WEFAT probe &mdash; does the embedding carry the physics.</td></tr>
+    <tr><td>DPI cascade</td><td>MI ceiling per stage; locates where sensitivity leaks.</td></tr>
+    <tr><td>$C=\max_p I$ &nbsp;(53)</td><td>Hard ceiling on separation / CLs reach.</td></tr>
+    <tr><td>$\tfrac12\log(1{+}S/N)$ &nbsp;(54)</td><td>Per-event sensitivity in the Gaussian limit.</td></tr>
+  </tbody>
+</table>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">Synthesis</h3>
+<p class="doc-p">$H(p_k)$ sets the <b>floor</b>, capacity $C$ sets the <b>ceiling</b>, the DPI cascade tells you where between
+  the two you are losing information, and a single <dfn data-term="partition-function">partition function</dfn> $Z$
+  ties the contrastive normalizer, the Bayesian evidence, and that floor together
+  <cite data-ref="kuntz2024,rospel2025"></cite> &mdash; the binding HELIX claims as its own. Same $Z$, three jobs:
+  the embedding (<dfn data-term="infonce">InfoNCE</dfn>), the background handle (surprisal), and the epistemic floor.</p>
+
+<p class="it-cap">Equation numbering follows Stone, <i>Information Theory: A Tutorial Introduction</i>
+  <cite data-ref="stone2019"></cite>, &sect;15 (Key Equations).</p>
+
+</div><!-- /it-main -->
+
+<!-- sticky aside -->
+<aside class="it-aside">
+  <div class="ag-kicker">The one move</div>
+  <p style="margin:0 0 12px;"><b>The detector is a noisy channel.</b> truth $x$ &rarr; response $R(y\mid x)$ &rarr; reco $y$;
+    the response is the noise $\eta$.</p>
+  <div class="ag-kicker" style="margin-top:16px;">Reads as</div>
+  <ul>
+    <li><b>Entropy</b> &rarr; MaxEnt floor $H(p_k)$</li>
+    <li><b>Surprisal</b> &rarr; background handle $S(x)$</li>
+    <li><b>$H(y\mid x)$</b> &rarr; detector resolution</li>
+    <li><b>$H(x\mid y)$</b> &rarr; unfolding limit</li>
+    <li><b>MI</b> &rarr; cut-variable power, WEFAT probe</li>
+    <li><b>DPI</b> &rarr; where sensitivity leaks</li>
+    <li><b>Capacity</b> &rarr; ceiling on CLs reach</li>
+  </ul>
+  <div class="ag-kicker" style="margin-top:16px;">Caveat</div>
+  <p style="margin:0;">$R(y\mid x)$ is a migration kernel, not additive&mdash;use the discrete eqs; Gaussian (54) is a special case.</p>
+</aside>
+
+</div><!-- /it-frame -->
+
+</div><!-- /.it -->
