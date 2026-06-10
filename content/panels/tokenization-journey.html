@@ -1,0 +1,115 @@
+<div class="tkj">
+
+<style>
+  .tkj .phases{margin:20px 0;padding:0;list-style:none;}
+  .tkj .ph{position:relative;margin:0 0 14px;padding:16px 20px 16px 22px;border-radius:6px;
+    border:1px solid var(--doc-line);border-left:3px solid var(--doc-line);background:var(--doc-bg-alt);}
+  .tkj .ph.done{border-left-color:#29c46b;}
+  .tkj .ph.active{border-left-color:var(--acc-orange);}
+  .tkj .ph.future{border-left-color:var(--doc-line);opacity:.92;}
+  .tkj .ph .pt{display:flex;align-items:center;gap:10px;margin:0 0 6px;}
+  .tkj .ph .pt h3{margin:0;font-size:16px;color:var(--doc-ink);}
+  .tkj .ph .st{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;
+    text-transform:uppercase;padding:3px 9px;border-radius:20px;border:1px solid;}
+  .tkj .st-done{color:#1f9d57;border-color:#9bd9b6;background:#eafaf1;}
+  .tkj .st-active{color:#9a5a12;border-color:#e6c79a;background:#fcf2e3;}
+  .tkj .st-future{color:var(--doc-ink-faint);border-color:var(--doc-line);background:var(--doc-bg-muted);}
+  .tkj .ph p{margin:6px 0 0;font-size:14px;line-height:1.6;color:var(--doc-ink-soft);}
+  .tkj .stamp{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.04em;
+    color:var(--acc-orange);margin:0 0 10px;}
+  .tkj table.res{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:13.5px;}
+  .tkj table.res th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10px;
+    letter-spacing:.12em;text-transform:uppercase;color:var(--acc-orange);
+    border-bottom:2px solid var(--doc-line);padding:0 11px 8px;}
+  .tkj table.res td{padding:9px 11px;border-bottom:1px solid var(--doc-line-soft);
+    color:var(--doc-ink-soft);font-family:'Share Tech Mono',monospace;font-size:12.5px;}
+  .tkj table.res td.pass{color:#1f9d57;font-weight:700;}
+  .tkj .caveat{margin:14px 0;padding:14px 18px;background:#fcf6e3;border:1px solid #e6d59a;
+    border-radius:6px;color:#7a6412;font-size:13.5px;line-height:1.6;}
+  .tkj .caveat b{color:#5e4d0e;}
+  .tkj .caveat ul{margin:8px 0 0;padding-left:18px;} .tkj .caveat li{margin:5px 0;}
+  .tkj .holder{font-style:italic;color:var(--doc-ink-faint);}
+</style>
+
+<div class="kicker"><span class="bar"></span>05 · Tokenization &mdash; Journey</div>
+<h2 class="doc-h2">Tokenization Journey &mdash; Phase Log</h2>
+
+<p class="lead">A living record of proving the &ldquo;numbers as tokens&rdquo; premise, phase by phase.
+  The Flow and Metrics panels are timeless; <b>this one updates</b>. Each phase's numbers are stamped with
+  the sample they came from, because readings change between rounds even when the framework does not.</p>
+
+<div class="rule"></div>
+
+<ul class="phases">
+
+  <li class="ph done">
+    <div class="pt"><h3>Phase 1 &mdash; Discretization sanity</h3><span class="st st-done">Done</span></div>
+    <p>Does binning a continuous feature into tokens preserve its label information? Run the gate on a
+      labeled signal+background sample across all four lanes (nn1/nn2 &times; barrel/endcap).</p>
+  </li>
+
+  <li class="ph active">
+    <div class="pt"><h3>Phase 2 &mdash; Early snapshot + cut grammar</h3><span class="st st-active">Next</span></div>
+    <p>One cutflow edit moves the snapshot <i>upstream</i> of the selective cuts and adds per-cut flags.
+      That yields a clean, region-matched re-measurement (separation that is feature-intrinsic, not
+      kinematic), unblocks the <dfn data-term="bigram">BiGram</dfn> grammar gate, and gives the sample the
+      $H$/$C$ machinery needs. Re-run across all four signal mass points.</p>
+  </li>
+
+  <li class="ph future">
+    <div class="pt"><h3>Phase 3 &mdash; Vectorization (Evt2Vec)</h3><span class="st st-future">Later</span></div>
+    <p>Turn the validated binning into an honest tokenizer (freeze edges, namespace, structural tokens,
+      ordering) and learn the embedding via <dfn data-term="infonce">InfoNCE</dfn> &mdash; which also supplies
+      the $I_\text{NCE}$ lower bound of the capacity bracket. Gate to <dfn data-term="cutformer">CutFormer</dfn>.</p>
+  </li>
+
+</ul>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">Phase 1 results</h3>
+<p class="stamp">ROUND 1 &middot; late snapshot (post-NN) &middot; signal = mS35, paired vs &ldquo;all&rdquo; HTmiss &middot; 2026-06-08</p>
+
+<p class="doc-p">All four lanes <b>PASS</b>: binning into 16 quantile tokens preserves both ranking
+  (median &Delta;AUC &minus;0.001 to &minus;0.003) and information
+  (<dfn data-term="mi-retention">MI retention</dfn> 0.93&ndash;1.01).</p>
+
+<table class="res">
+  <tr><th>lane</th><th>n_sig</th><th>n_bkg</th><th>feats</th><th>best AUC</th><th>med &Delta;AUC</th><th>med MI&nbsp;retain</th><th>collapsed</th><th>verdict</th></tr>
+  <tr><td>nn1_barrel</td><td>263</td><td>524</td><td>29</td><td>0.993</td><td>&minus;0.001</td><td>1.007</td><td>14</td><td class="pass">PASS</td></tr>
+  <tr><td>nn1_endcap</td><td>565</td><td>17038</td><td>30</td><td>0.906</td><td>&minus;0.003</td><td>0.956</td><td>11</td><td class="pass">PASS</td></tr>
+  <tr><td>nn2_barrel</td><td>263</td><td>524</td><td>24</td><td>0.993</td><td>&minus;0.001</td><td>1.007</td><td>7</td><td class="pass">PASS</td></tr>
+  <tr><td>nn2_endcap</td><td>565</td><td>17038</td><td>24</td><td>0.909</td><td>&minus;0.003</td><td>0.930</td><td>8</td><td class="pass">PASS</td></tr>
+</table>
+
+<p class="doc-p">Illustrative readings (how the Metrics panel maps onto real numbers):
+  the strongest separator <code>htmiss_NOSYS</code> is also the worst MI-retainer
+  (retention 0.67) &mdash; it carries the most information (mi_raw 0.091 vs ~0.04 elsewhere), so 16 bins
+  shed the most absolute MI even as AUC barely moves. The isolation features collapse hardest
+  (<code>sumTrackPt0p2Cone</code> max_bin_frac 0.81 &mdash; 81% of events in one bin), being zero-inflated.</p>
+
+<div class="caveat"><b>Round-1 caveats &mdash; these numbers are a first pass, not the result.</b>
+  <ul>
+    <li><b>AUCs are inflated by region mismatch.</b> VR is HTmiss&nbsp;&lt;&nbsp;40&nbsp;GeV; signal
+      &ldquo;all&rdquo; spans 0&ndash;700. So much of the apparent separation is kinematic, not
+      feature-intrinsic. The retention conclusion is robust to this; the AUC <i>magnitudes</i> are not
+      physics discrimination.</li>
+    <li><b>Single mass point.</b> mS35 only &mdash; mass-point sensitivity deferred to the four-point re-run.</li>
+    <li><b>Barrel is borderline-stat</b> (263 signal rows, just over the 200 floor).</li>
+    <li><b>Post-NN sample.</b> Survivors, not the process &mdash; no cut grammar and no per-stage floor are
+      computable here. That is exactly what Phase 2 fixes.</li>
+  </ul>
+</div>
+
+<p class="doc-p"><b>What Phase 1 establishes:</b> the tokenization step is information-preserving in-domain
+  on ATLAS data &mdash; the <dfn data-term="data-processing-inequality">DPI</dfn> step is lossless. <b>What it
+  does not:</b> clean feature-only separation, mass-point generality, cut grammar, or any
+  <dfn data-term="channel-capacity">capacity</dfn>/floor number. Those wait on Phase 2.</p>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">Phase 2 results</h3>
+<p class="doc-p holder">Pending the cutflow rebuild. To be filled with the early-snapshot, region-matched,
+  four-mass-point re-measurement and the first cut-grammar and capacity/floor numbers.</p>
+
+</div>

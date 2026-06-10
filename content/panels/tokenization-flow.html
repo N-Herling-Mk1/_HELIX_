@@ -1,0 +1,120 @@
+<div class="tkf">
+
+<style>
+  .tkf .tkf-steps{counter-reset:tkfstep;margin:22px 0 6px;padding:0;list-style:none;}
+  .tkf .tkf-steps li{position:relative;margin:0 0 16px;padding:14px 20px 14px 58px;
+    background:var(--doc-bg-alt);border:1px solid var(--doc-line);border-left:3px solid var(--acc-orange);
+    border-radius:6px;line-height:1.6;color:var(--doc-ink-soft);}
+  .tkf .tkf-steps li::before{counter-increment:tkfstep;content:counter(tkfstep);
+    position:absolute;left:16px;top:14px;width:26px;height:26px;border-radius:50%;
+    background:var(--acc-orange);color:#02121c;font-family:'Share Tech Mono',monospace;
+    font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;}
+  .tkf .tkf-steps li b{color:var(--doc-ink);}
+  .tkf .tkf-pipe{font-family:'Share Tech Mono',monospace;font-size:12.5px;line-height:1.9;
+    background:#020c14;color:#b9cdda;border:1px solid var(--doc-line);border-radius:8px;
+    padding:16px 20px;margin:20px 0;overflow-x:auto;}
+  .tkf .tkf-pipe .c{color:var(--acc-cyan);} .tkf .tkf-pipe .o{color:var(--acc-orange);}
+  .tkf table.cmp{width:100%;border-collapse:collapse;margin:18px 0 4px;font-size:14.5px;}
+  .tkf table.cmp th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10.5px;
+    letter-spacing:.15em;text-transform:uppercase;color:var(--acc-orange);
+    border-bottom:2px solid var(--doc-line);padding:0 14px 9px;}
+  .tkf table.cmp td{vertical-align:top;padding:10px 14px;border-bottom:1px solid var(--doc-line-soft);
+    color:var(--doc-ink-soft);line-height:1.5;}
+  .tkf table.cmp td:first-child{color:var(--doc-ink);white-space:nowrap;font-weight:600;}
+  .tkf table.cmp tr:hover td{background:var(--doc-bg-muted);}
+  .tkf .tkf-note{margin:18px 0;padding:14px 18px;background:var(--doc-bg-muted);
+    border:1px solid var(--doc-line);border-radius:6px;color:var(--doc-ink-soft);font-size:14px;line-height:1.6;}
+  .tkf .tkf-note b{color:var(--doc-ink);}
+</style>
+
+<div class="kicker"><span class="bar"></span>03 · Tokenization &mdash; Flow</div>
+<h2 class="doc-h2">From Detector Numbers to Embedded Vectors</h2>
+
+<p class="lead">A transformer does not read numbers; it reads <b>tokens</b> &mdash; integer IDs drawn from a
+  fixed vocabulary, each mapped to a learned vector by an embedding table. Both a page of text and a
+  table of continuous detector features must arrive at that same destination. The destination is
+  identical; the <i>route</i> is nearly opposite. This panel lays out both routes and where HELIX's
+  data joins them.</p>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">The shared destination</h3>
+<p class="doc-p">Whatever the source, an embedding layer eats exactly one thing: a sequence of integer
+  token IDs from a finite vocabulary of size $V$. The embedding table is a lookup &mdash; row $i$ is a
+  learned vector for token $i$. So every pipeline must produce (a) a fixed vocabulary, and (b) each input
+  as an ordered list of IDs in $[0, V)$. <dfn data-term="evt2vec">Vectorization</dfn> &mdash; learning
+  those rows &mdash; is mechanically the same for text and for detector features; only the <i>meaning</i>
+  of a row differs.</p>
+
+<div class="tkf-pipe">
+source &rarr; <span class="o">TOKENIZE</span> &rarr; integer IDs &rarr; <span class="c">EMBED</span> &rarr; vectors &rarr; transformer
+</div>
+
+<h3 class="doc-h3">Route A &mdash; continuous detector features</h3>
+<p class="doc-p">Detector data arrives <b>dense, continuous, and ordered</b> &mdash; real magnitudes, no natural
+  symbols. Tokenization here is a <dfn data-term="quantile-binning">quantization</dfn> problem: you must
+  <i>manufacture</i> the symbols. Four steps take a CSV value to an honest token:</p>
+
+<ol class="tkf-steps">
+  <li><b>Bin &mdash; and freeze the edges.</b> <dfn data-term="binning">Binning</dfn> splits each feature's
+    range into intervals and replaces a value with its interval index. Edges are fit <i>once</i> on a
+    training set and reused everywhere, so a token means the same value-range in every sample.
+    <cite data-ref="gorishniy2022"></cite></li>
+  <li><b>Namespace into one vocabulary.</b> Each feature bins to $0\ldots\text{N}_\text{bins}-1$
+    independently, so codes collide across features. Offset each feature into its own block
+    (feature&nbsp;0 &rarr; $0\ldots15$, feature&nbsp;1 &rarr; $16\ldots31$, &hellip;) so every ID is
+    globally unique and means one <i>(feature, bin)</i> pair.</li>
+  <li><b>Add structural tokens.</b> Zero-inflated and integer-count features need explicit handling: a
+    dedicated <i>zero</i> token, native tokens for small-integer counts, and reserved <i>missing</i> /
+    <i>out-of-range</i> tokens. (Which features need this is read straight off the occupancy metrics.)</li>
+  <li><b>Order into a sequence.</b> An event is a <i>set</i> of features; a transformer needs an order.
+    HELIX uses the causally-ordered <dfn data-term="cutflow">cutflow</dfn> sequence, with a
+    feature/position tag so the model knows what each slot is. <cite data-ref="janner2021"></cite></li>
+</ol>
+
+<h3 class="doc-h3">Route B &mdash; a text corpus</h3>
+<p class="doc-p">Text arrives <b>already discrete and symbolic</b>. There is nothing continuous to bin;
+  tokenization is a <i>segmentation + vocabulary</i> problem. Sub-word schemes
+  (<dfn data-term="subword-tokenization">BPE / WordPiece</dfn>) build the vocabulary from <i>corpus
+  frequency</i> &mdash; merge the most common character pairs until a target size is reached &mdash; then map
+  each unit to an ID by dictionary lookup. <cite data-ref="mikolov2013"></cite> The vocabulary is one
+  shared set, order is the natural reading order, and a token ID is purely <i>nominal</i>: token 4012 has
+  no magnitude.</p>
+
+<h3 class="doc-h3">The two routes side by side</h3>
+<table class="cmp">
+  <tr><th>&nbsp;</th><th>Text corpus</th><th>Continuous features (HELIX)</th></tr>
+  <tr><td>Input</td><td>discrete symbols already</td><td>dense continuous scalars</td></tr>
+  <tr><td>&ldquo;Tokenize&rdquo; means</td><td>segment + build vocab</td><td>quantize (bin)</td></tr>
+  <tr><td>Vocabulary source</td><td>corpus co-occurrence frequency</td><td>per-feature quantization edges</td></tr>
+  <tr><td>Vocabulary scope</td><td>one shared set</td><td>per-feature &rarr; must be merged (step 2)</td></tr>
+  <tr><td>Sequence order</td><td>natural word order</td><td>imposed &mdash; the cutflow order</td></tr>
+  <tr><td>Token-ID meaning</td><td><b>nominal</b> (no magnitude)</td><td><b>ordinal</b> (magnitude survives)</td></tr>
+  <tr><td>What's discarded</td><td>nothing &mdash; already discrete</td><td>within-bin resolution</td></tr>
+</table>
+
+<h3 class="doc-h3">The vectorization step, and why HELIX's case is richer</h3>
+<p class="doc-p">Both routes feed an embedding table and learn vectors the same way &mdash; but the opportunity
+  differs. Text IDs start meaningless, so the embedding must learn all structure from co-occurrence
+  alone. HELIX's tokens are <b>ordinal</b>: bin&nbsp;7 really is larger than bin&nbsp;3. A naive lookup
+  table throws that away, treating adjacent bins as unrelated symbols; numeric-aware embeddings
+  (<dfn data-term="numeric-embedding">piecewise-linear / periodic</dfn>) preserve the ordering you worked
+  to keep. <cite data-ref="gorishniy2022"></cite> This is the open design choice at the
+  <dfn data-term="evt2vec">Evt2Vec</dfn> stage: embed bins <i>nominally</i> (simple) or
+  <i>numeric-aware</i> (preserves magnitude).</p>
+
+<div class="tkf-note"><b>The bonus text never gets.</b> A HELIX token is not an arbitrary symbol &mdash; it
+  is &ldquo;feature&nbsp;F is in value-range&nbsp;R.&rdquo; So a learned vector can be checked against
+  <i>physics</i>: do adjacent value-bins sit near each other, do high-displacement bins cluster with
+  signal? Text embeddings can only be validated relationally; HELIX embeddings can be validated against
+  known physical ordering.</div>
+
+<div class="rule"></div>
+<p class="doc-p" style="color:var(--doc-ink-faint);font-size:13.5px;">Scope note: the discretization gate
+  validates only the <b>first step</b> &mdash; that binning preserves a feature's label information.
+  Steps&nbsp;2&ndash;4 (namespacing, structural tokens, ordering) and the embedding choice are built at the
+  Evt2Vec / <dfn data-term="cutformer">CutFormer</dfn> stage. &ldquo;We proved we <i>can</i> tokenize&rdquo;
+  is not yet &ldquo;we <i>have</i> a tokenizer.&rdquo; See the Metrics panel for how that first step is
+  measured, and the Journey panel for current results.</p>
+
+</div>

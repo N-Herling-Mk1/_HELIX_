@@ -1,0 +1,160 @@
+<div class="tkm">
+
+<style>
+  .tkm .leg{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0 6px;font-size:12.5px;}
+  .tkm .chip{display:inline-flex;align-items:center;gap:7px;padding:4px 11px;border-radius:20px;
+    font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.04em;border:1px solid;}
+  .tkm .chip::before{content:'';width:8px;height:8px;border-radius:50%;}
+  .tkm .c-good{color:#1f9d57;border-color:#9bd9b6;background:#eafaf1;}   .tkm .c-good::before{background:#29c46b;}
+  .tkm .c-more{color:#9a7b12;border-color:#e6d59a;background:#fcf6e3;}   .tkm .c-more::before{background:#e0b020;}
+  .tkm .c-bad{color:#b3403a;border-color:#e6b3b0;background:#fbeceb;}    .tkm .c-bad::before{background:#e0524d;}
+  .tkm .c-info{color:#1a6f86;border-color:#a8d6e2;background:#e8f6fa;}   .tkm .c-info::before{background:#00aecb;}
+  .tkm table.mx{width:100%;border-collapse:collapse;margin:14px 0 4px;font-size:14px;}
+  .tkm table.mx th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10px;
+    letter-spacing:.13em;text-transform:uppercase;color:var(--acc-orange);
+    border-bottom:2px solid var(--doc-line);padding:0 12px 9px;}
+  .tkm table.mx td{vertical-align:top;padding:11px 12px;border-bottom:1px solid var(--doc-line-soft);
+    color:var(--doc-ink-soft);line-height:1.5;}
+  .tkm table.mx td:first-child{color:var(--doc-ink);white-space:nowrap;
+    font-family:'Share Tech Mono',monospace;font-size:12.5px;}
+  .tkm table.mx tr:hover td{background:var(--doc-bg-muted);}
+  .tkm .rng{font-family:'Share Tech Mono',monospace;font-size:11.5px;color:var(--doc-ink-faint);}
+  .tkm .tkm-eqn{margin:18px 0;padding:14px 22px;background:var(--doc-bg-alt);
+    border:1px solid var(--doc-line);border-left:3px solid var(--acc-orange);border-radius:6px;
+    text-align:center;overflow-x:auto;}
+  .tkm .grafgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:16px 0;}
+  @media(max-width:760px){.tkm .grafgrid{grid-template-columns:1fr;}}
+  .tkm .graf{background:var(--doc-bg-alt);border:1px solid var(--doc-line);border-radius:6px;padding:14px 16px;}
+  .tkm .graf h4{margin:0 0 6px;font-size:14px;color:var(--doc-ink);}
+  .tkm .graf p{margin:0;font-size:13px;line-height:1.55;color:var(--doc-ink-soft);}
+  .tkm .tkm-note{margin:18px 0;padding:14px 18px;background:var(--doc-bg-muted);
+    border:1px solid var(--doc-line);border-radius:6px;color:var(--doc-ink-soft);font-size:14px;line-height:1.6;}
+  .tkm .tkm-note b{color:var(--doc-ink);}
+</style>
+
+<div class="kicker"><span class="bar"></span>04 · Tokenization &mdash; Metrics</div>
+<h2 class="doc-h2">Reading the Instruments</h2>
+
+<p class="lead">The discretization gate emits a per-feature table and a four-panel figure. This panel is
+  the <b>permanent</b> reading guide: what each metric measures, its range, and what counts as
+  good / not-enough-information / bad / informative &mdash; with no specific run's numbers, so it stays true
+  across phases. The headline question it all serves: <i>does turning a number into a token throw away
+  what the number told us about the physics?</i> &mdash; and, ultimately, how close can we get to the
+  detector's <dfn data-term="channel-capacity">channel capacity</dfn>.</p>
+
+<div class="leg">
+  <span class="chip c-good">GOOD &mdash; premise holds</span>
+  <span class="chip c-more">NOT ENOUGH INFO &mdash; stats / tune</span>
+  <span class="chip c-bad">BAD &mdash; premise fails</span>
+  <span class="chip c-info">INFORMATIVE &mdash; design signal, not pass/fail</span>
+</div>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">What we are ultimately after: capacity</h3>
+<p class="doc-p">A detector is a <dfn data-term="noisy-channel">noisy channel</dfn> carrying the truth-level
+  event $x$ to the reconstructed event $y$. <cite data-ref="stone2019"></cite> Its
+  <dfn data-term="channel-capacity">capacity</dfn> $C$ is the <i>maximum</i> mutual information any
+  analysis could extract &mdash; the ceiling on achievable signal/background separation. Everything the gate
+  measures is a <dfn data-term="mutual-information">mutual-information</dfn> quantity that lives
+  <i>below</i> that ceiling, in one bracket:</p>
+
+<div class="tkm-eqn">$I_\text{NCE} \;\le\; I_\text{empirical}(x;y) \;\le\; C \;\le\; C_\text{Gauss}$</div>
+
+<p class="doc-p">The gate's per-feature MI is a <b>marginal building block</b> &mdash; the information in
+  <i>one</i> feature about the label &mdash; not $C$ itself ($C$ is the joint maximum, estimated later from
+  the response matrix). What the gate actually tests is the <dfn data-term="data-processing-inequality">data-processing
+  inequality</dfn>: binning is a processing step, so $I(\text{bin}(x);y) \le I(x;y)$. If binning preserves
+  the MI, tokenization sits as a lossless step inside that bracket. <b>MI retention is the DPI, measured.</b></p>
+
+<h3 class="doc-h3">Metric reference &mdash; separation &amp; information</h3>
+<table class="mx">
+  <tr><th>Metric</th><th>Measures</th><th>Range</th><th>How to read it</th></tr>
+  <tr><td>auc_raw</td><td>1-D separation of the <i>continuous</i> feature (rank-based, <dfn data-term="auc">ROC AUC</dfn>)</td>
+    <td class="rng">0.5 &ndash; 1.0</td>
+    <td><span class="chip c-good">&gt;0.65 separating</span> <span class="chip c-more">0.55&ndash;0.65 weak</span> <span class="chip c-bad">&le;0.55 none</span></td></tr>
+  <tr><td>auc_bin</td><td>same, after binning into tokens</td><td class="rng">0.5 &ndash; 1.0</td>
+    <td>read only against auc_raw &mdash; see &Delta;AUC</td></tr>
+  <tr><td>dAUC</td><td>auc_bin &minus; auc_raw: ranking power <i>lost</i> to binning</td><td class="rng">&minus;0.5 &ndash; +&epsilon;</td>
+    <td><span class="chip c-good">&ge;&minus;0.02</span> <span class="chip c-more">&minus;0.05 &ndash; &minus;0.02</span> <span class="chip c-bad">&lt;&minus;0.05</span></td></tr>
+  <tr><td>ks_raw</td><td><dfn data-term="ks-statistic">Kolmogorov&ndash;Smirnov</dfn> gap between sig/bkg CDFs</td><td class="rng">0 &ndash; 1</td>
+    <td>shape-based separation; cross-check on auc_raw (high = strong)</td></tr>
+  <tr><td>mi_raw</td><td>MI(feature; label), continuous reference (nats)</td><td class="rng">&ge;0, small under imbalance</td>
+    <td><span class="chip c-info">absolute size is <i>not</i> a verdict</span> &mdash; it's the denominator for retention</td></tr>
+  <tr><td>mi_bin</td><td>MI(token; label), after binning (nats)</td><td class="rng">&ge;0</td>
+    <td>read only as a ratio to mi_raw</td></tr>
+  <tr><td>mi_retain</td><td>mi_bin / mi_raw &mdash; fraction of information surviving tokenization (the DPI, measured)</td>
+    <td class="rng">~0 &ndash; ~1 (&gt;1 = noise)</td>
+    <td><span class="chip c-good">&gt;0.90</span> <span class="chip c-more">0.75&ndash;0.90</span> <span class="chip c-bad">&lt;0.75</span></td></tr>
+</table>
+
+<div class="tkm-note"><b>Why MI magnitude is not a pass/fail.</b> Under heavy class imbalance the label
+  entropy $H(Y)$ is tiny, so absolute MI is small <i>even for a strong discriminator</i>. The verdict
+  therefore reads separation from <b>AUC</b> (rank-based, imbalance-robust) and reads preservation from the
+  <b>retention ratio</b> (where the imbalance cancels). A retention slightly above 1.0 is estimator
+  residual (<dfn data-term="miller-madow">Miller&ndash;Madow</dfn> on finite samples), read as &asymp;1.0.</div>
+
+<h3 class="doc-h3">Metric reference &mdash; occupancy (informative, not pass/fail)</h3>
+<p class="doc-p">These two do not pass or fail the gate. They are <span class="chip c-info">informative</span> &mdash;
+  they tell you <i>which</i> features tokenize cleanly and which need special handling, feeding the
+  tokenizer design directly.</p>
+<table class="mx">
+  <tr><th>Metric</th><th>Measures</th><th>Range</th><th>What it tells you</th></tr>
+  <tr><td>empty_bins</td><td>how many of the N requested bins ended up empty</td><td class="rng">0 &ndash; N</td>
+    <td>high = <dfn data-term="quantile-binning">quantile</dfn> collapse; the feature uses fewer tokens than asked &rarr; give it fewer bins or native tokens</td></tr>
+  <tr><td>max_bin_frac</td><td>fraction of events in the single most-populated bin</td><td class="rng">1/N &ndash; 1.0</td>
+    <td>near 1.0 = a spike (often zero-inflated); most events share one token &rarr; needs a dedicated zero-token</td></tr>
+</table>
+
+<h3 class="doc-h3">The verdict, and the summary fields</h3>
+<p class="doc-p">Per lane the gate resolves one of three states, judged the imbalance-robust way:</p>
+<table class="mx">
+  <tr><th>Verdict</th><th>Condition</th><th>Meaning</th></tr>
+  <tr><td><span class="chip c-good">PASS</span></td><td>median retention &gt; 0.90 and median &Delta;AUC &gt; &minus;0.02 on separating features</td><td>binning preserves ranking and information &mdash; tokenization safe on this lane</td></tr>
+  <tr><td><span class="chip c-more">WATCH</span></td><td>separation exists but retention or &Delta;AUC erodes it</td><td>tune N_BINS / strategy before trusting it</td></tr>
+  <tr><td><span class="chip c-bad">FLOORED</span></td><td>best AUC &lt; 0.55 (no feature separates)</td><td>nothing to preserve here &mdash; trigger an earlier-snapshot sample</td></tr>
+</table>
+<p class="doc-p">The cross-lane <code>phase1_summary.csv</code> carries one row per lane:
+  <code>n_sig / n_bkg</code> (class counts), <code>best_AUC</code>, <code>sep_feats</code> (features above 0.55),
+  <code>med_dAUC</code>, <code>med_MI_retain</code>, <code>collapsed_feats</code>,
+  <code>low_stat</code> (smaller class &lt; 200 &rarr; verdict indicative only), and <code>verdict</code>.</p>
+
+<h3 class="doc-h3">The four graph panels</h3>
+<div class="grafgrid">
+  <div class="graf"><h4>&Delta;AUC bars (top features)</h4><p>Ranking lost to binning, per top feature.
+    <b>Good:</b> bars hug zero. <b>Watch:</b> a bar past &minus;0.02 (orange).</p></div>
+  <div class="graf"><h4>MI raw vs binned scatter</h4><p>Each feature a point; the diagonal is perfect
+    retention. <b>Good:</b> points on the line. <b>Watch:</b> a point dropping below &mdash; that feature
+    lost information (often the most MI-rich one, which has the most to lose).</p></div>
+  <div class="graf"><h4>Vocabulary-size knee</h4><p>Mean retention vs <dfn data-term="vocabulary-size">N_BINS</dfn>.
+    Rises and plateaus; the knee is the smallest vocabulary that keeps the information &mdash; it
+    <i>sizes the embedding vocabulary</i>. A late knee means 16 bins is too few.</p></div>
+  <div class="graf"><h4>Bin-occupancy heatmap</h4><p>Feature &times; bin fraction. Black cells = empty bins.
+    A row that is one bright cell = a collapsed feature. <span class="chip c-info">Informative</span>:
+    this is the tokenizer to-do list, made visual.</p></div>
+</div>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">What we have once we establish the channel's capacity</h3>
+<p class="doc-p">The gate confirms tokenization is lossless; capacity is the larger prize it serves. Once
+  $C$ is estimated (truth&rarr;reco response matrix &rarr; <dfn data-term="maxent">Blahut&ndash;Arimoto</dfn>),
+  three things become available that per-feature MI alone cannot give:</p>
+<ul class="doc-list">
+  <li><b>A performance ceiling.</b> $C$ is the most separation <i>any</i> classifier could achieve on
+    this data. Comparing a model's achieved MI to $C$ says how much is left on the table &mdash; whether to
+    build a better model or whether the detector simply cannot do more.</li>
+  <li><b>The capacity-achieving prior.</b> Blahut&ndash;Arimoto also returns the input distribution that
+    saturates $C$ &mdash; which truth configurations carry the most recoverable information.</li>
+  <li><b>The epistemic-floor check.</b> The per-stage entropy floor $H(p_k)$ versus a model's
+    <dfn data-term="bll">predictive entropy</dfn> tests that the model never claims to know more than the
+    physics allows. <cite data-ref="jaynes1957"></cite></li>
+</ul>
+
+<div class="tkm-note"><b>Where these metrics sit.</b> The discretization metrics fill in only the
+  <i>left</i> of the bracket &mdash; the measured, marginal MI. Capacity ($C$, $C_\text{Gauss}$) is the right
+  side, computed from the response matrix and independent of any embedding. The InfoNCE term
+  $I_\text{NCE}$ arrives later, from <dfn data-term="evt2vec">Evt2Vec</dfn> training. The bracket is the
+  map; this gate is one rung of it.</div>
+
+</div>
