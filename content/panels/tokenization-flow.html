@@ -31,8 +31,9 @@
 <h2 class="doc-h2">From Detector Numbers to Embedded Vectors</h2>
 
 <p class="lead">A transformer does not read numbers; it reads <b>tokens</b> &mdash; integer IDs drawn from a
-  fixed vocabulary, each mapped to a learned vector by an embedding table. Both a page of text and a
-  table of continuous detector features must arrive at that same destination. The destination is
+  fixed vocabulary, each mapped to a learned vector by an embedding table. Tokenization is primarily known as a 
+  text corpus operation. This raises the question: How do both a page of text and a
+  table of continuous detector features arrive at that same destination? The destination is
   identical; the <i>route</i> is nearly opposite. This panel lays out both routes and where HELIX's
   data joins them.</p>
 
@@ -50,7 +51,7 @@
 source &rarr; <span class="o">TOKENIZE</span> &rarr; integer IDs &rarr; <span class="c">EMBED</span> &rarr; vectors &rarr; transformer
 </div>
 
-<h3 class="doc-h3">Route A &mdash; continuous detector features</h3>
+<h3 class="doc-h3">Continuous data to  embedded vectors</h3>
 <p class="doc-p">Detector data arrives <b>dense, continuous, and ordered</b> &mdash; real magnitudes, no natural
   symbols. Tokenization here is a <dfn data-term="quantile-binning">quantization</dfn> problem: you must
   <i>manufacture</i> the symbols. Four steps take a CSV value to an honest token:</p>
@@ -72,7 +73,7 @@ source &rarr; <span class="o">TOKENIZE</span> &rarr; integer IDs &rarr; <span cl
     feature/position tag so the model knows what each slot is. <cite data-ref="janner2021"></cite></li>
 </ol>
 
-<h3 class="doc-h3">Route B &mdash; a text corpus</h3>
+<h3 class="doc-h3">Text corpus to embedded vectors</h3>
 <p class="doc-p">Text arrives <b>already discrete and symbolic</b>. There is nothing continuous to bin;
   tokenization is a <i>segmentation + vocabulary</i> problem. Sub-word schemes
   (<dfn data-term="subword-tokenization">BPE / WordPiece</dfn>) build the vocabulary from <i>corpus
