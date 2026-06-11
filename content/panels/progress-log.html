@@ -1,0 +1,236 @@
+<div class="plog">
+
+<style>
+  .plog .post{margin:18px 0;border:1px solid var(--doc-line);border-left:3px solid var(--acc-orange);
+    border-radius:6px;background:var(--doc-bg-alt);padding:16px 20px;}
+  .plog .post-head{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;margin:0 0 6px;}
+  .plog .post-date{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.06em;color:var(--acc-orange);}
+  .plog .post-head h3{margin:0;font-size:17px;color:var(--doc-ink);flex:1 1 auto;}
+  .plog .pills{display:flex;gap:5px;flex-wrap:wrap;}
+  .plog .pill{font-family:'Share Tech Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;
+    width:18px;height:18px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;border:1px solid;}
+  .plog .p-H{color:#0e6f86;border-color:#9fd3df;background:#e7f6fa;}
+  .plog .p-E{color:#1f9d57;border-color:#a8dcc0;background:#e9f7ef;}
+  .plog .p-L{color:#5a8a1f;border-color:#cbe3a0;background:#f1f7e6;}
+  .plog .p-I{color:#7a52c2;border-color:#cdbce9;background:#f1ecf9;}
+  .plog .p-X{color:#9a5a12;border-color:#e6c79a;background:#fcf2e3;}
+  .plog .tldr{margin:0;font-size:14.5px;line-height:1.65;color:var(--doc-ink-soft);}
+  .plog .tldr b{color:var(--doc-ink);}
+  .plog details.more{margin-top:12px;border-top:1px dashed var(--doc-line);padding-top:10px;}
+  .plog details.more>summary{cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:11px;
+    letter-spacing:.08em;text-transform:uppercase;color:var(--acc-cyan);list-style:none;user-select:none;}
+  .plog details.more>summary::-webkit-details-marker{display:none;}
+  .plog details.more>summary::before{content:"\25B8  ";color:var(--acc-orange);}
+  .plog details.more[open]>summary::before{content:"\25BE  ";}
+  .plog .detail h4{margin:16px 0 5px;font-size:13.5px;color:var(--doc-ink);
+    font-family:'Share Tech Mono',monospace;letter-spacing:.04em;}
+  .plog .detail p,.plog .detail li{font-size:13.5px;line-height:1.6;color:var(--doc-ink-soft);}
+  .plog .detail code{font-family:'Share Tech Mono',monospace;font-size:12px;
+    background:var(--doc-bg-muted);padding:1px 5px;border-radius:3px;color:var(--doc-ink);}
+  .plog .detail ul{margin:6px 0;padding-left:20px;} .plog .detail li{margin:3px 0;}
+  .plog .resume-wrap{margin:16px 0 4px;}
+  .plog .resume-label{font-family:'Share Tech Mono',monospace;font-size:11px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--acc-orange);margin:0 0 4px;}
+  .plog .resume-hint{font-size:12px;color:var(--doc-ink-faint);font-style:italic;margin:0 0 6px;}
+  .plog pre.resume{background:#0e1620;color:#cfe7ee;border:1px solid var(--doc-line);border-radius:6px;
+    padding:14px 16px;font-family:'Share Tech Mono',monospace;font-size:11.5px;line-height:1.5;
+    white-space:pre-wrap;word-break:break-word;overflow-x:auto;max-height:480px;overflow-y:auto;}
+</style>
+
+<div class="kicker"><span class="bar"></span>LOG · Progress</div>
+<h2 class="doc-h2">Progress Log</h2>
+<p class="lead">A running record of where the work stands, newest first. Each entry opens with a
+  one-paragraph summary; expand <b>Full detail &amp; resume context</b> for the technical write-up and a
+  copy-paste block that can seed a fresh working session.</p>
+
+<div class="rule"></div>
+
+<!-- ============================== POST TEMPLATE (copy, fill, place at top) ==============================
+<article class="post">
+  <div class="post-head">
+    <span class="post-date">YYYY-MM-DD</span>
+    <h3>Title</h3>
+    <span class="pills"><span class="pill p-H">H</span> ... </span>
+  </div>
+  <p class="tldr"><b>Lead.</b> two-to-four sentence overview.</p>
+  <details class="more"><summary>Full detail &amp; resume context</summary>
+    <div class="detail"> ...prose sections... </div>
+    <div class="resume-wrap">
+      <p class="resume-label">Resume context</p>
+      <p class="resume-hint">Select all inside the box and paste into a new conversation to pick up here.</p>
+      <pre class="resume"> ...dense brief... </pre>
+    </div>
+  </details>
+</article>
+======================================================================================================= -->
+
+<article class="post">
+  <div class="post-head">
+    <span class="post-date">2026-06-10</span>
+    <h3>Phase 2 kickoff — snapshot point chosen, tokenization schema locked</h3>
+    <span class="pills"><span class="pill p-H">H</span><span class="pill p-L">L</span><span class="pill p-I">I</span><span class="pill p-X">X</span></span>
+  </div>
+
+  <p class="tldr"><b>Decided where to snapshot the cutflow and proved the feature schema matches across
+    signal and background.</b> Built a diagnostic tool that dumps signal-vs-VR columns from real snapshot
+    files; it confirmed all <b>33 raw tokenization features are present and identical</b> on both sides
+    (456 shared columns, no dtype mismatches). The Phase-2 snapshot branches right after the trigger cut,
+    keeping every downstream cut as a per-event flag instead of dropping rows. The signal MC (mc23a) and VR
+    background (data24) are a known two-year campaign mismatch — accepted as explicitly caveated exploratory,
+    with pileup-reweighting and a μ-stability control queued. Next: the cutflow patch, then the 5-metric
+    dashboard.</p>
+
+  <details class="more"><summary>Full detail &amp; resume context</summary>
+  <div class="detail">
+
+    <h4>The diagnostic tool</h4>
+    <p><code>diagnose_snapshot_columns.py</code> — purpose: before designing signal↔background matching,
+      establish ground truth about the snapshot schema. It reads snapshot files (<code>.root</code> via
+      PyROOT/uproot, or <code>.csv</code>), classifies every column (label / weight / kinematics / region /
+      NN-score / pass-flag / vertex / track-jet / trigger), computes the signal∩VR intersection, flags
+      MC-only branches and dtype mismatches, parses the cutflow C++ source for the authoritative
+      raw→scaled map and the cut sequence, and writes a JSON report. It modifies nothing.</p>
+
+    <h4>What it found (baseline, post-NN snapshots)</h4>
+    <ul>
+      <li>Background (data24VR): <code>events.root</code> tree <code>analysis</code>, <b>474 columns</b>.</li>
+      <li>Signal (mc23a mS35): <b>476 columns</b>.</li>
+      <li><b>456 shared</b>; 20 signal-only (MC scale-factors / weights / <code>sumOfWeights</code>);
+        18 background-only (extra trigger branches from the looser data skim). <b>No dtype mismatches.</b></li>
+      <li><b>33 raw (<code>*_raw</code>) features — all 33 in the shared set.</b> These are the token
+        vocabulary. 50 scaled twins exist (config-dependent, avoid); 276 vector-typed branches incl.
+        <code>InputMapNN*</code> (NN-internal plumbing, avoid).</li>
+    </ul>
+
+    <h4>Snapshot point — chosen and why</h4>
+    <p>Key fact from the source scan: all 279 feature columns are <code>.Define</code>d <i>before</i> any
+      filter, so the snapshot's <i>column set is identical at every cut stage</i> — moving the snapshot
+      changes which <b>rows</b> survive, not which columns exist. So the design question is row-survival,
+      not column availability. Decision: <b>branch after "Passes Trigger" (stage 1 of 14)</b>; keep
+      <code>1 MSVtx</code> as a filter on the branch (per-vertex <code>.at(0)</code> indexing safety);
+      convert every downstream cut (<code>nMDT … NN2</code>) to a <code>pass_*</code> boolean flag (no row
+      drop); redirect the snapshot to that branch while leaving the original filtered chain intact so the
+      cutflow Report/yields still reproduce Julian's reference. Branching <i>before</i> HTmiss keeps it
+      un-applied so signal can be region-matched to the VR in Python on raw <code>htmiss_NOSYS</code>.</p>
+
+    <h4>Data / background files in use</h4>
+    <ul>
+      <li><b>Signal MC (mc23a only — no mc23e exists, checked disk + CERNBox):</b> DSIDs 537836 mS5 ct411,
+        537837 mS16 ct580, 537838 mS35 ct1310, 537839 mS55 ct1050. On disk at
+        <code>/data2/kjohns/run3_sample_ntuple_files/mc/HSS/</code>.</li>
+      <li><b>Background VR (data24VR only — no data22/23 VR exists):</b> 65 GB at
+        <code>/data2/kjohns/run3_sample_ntuple_files/data/data24/data24VR/</code>.</li>
+      <li><b>Campaign mismatch:</b> mc23a = 2022 conditions; data24 = 2024 (would be mc23e). ⟨μ⟩ ≈ 54 vs 64.
+        Accepted as caveated exploratory. Mitigations: (a) pileup-reweight weighted MC to the data24
+        μ-profile; (b) μ-stability control in the grammar test. mc23e/data23VR production request declined
+        for now.</li>
+    </ul>
+
+    <h4>Matching scheme — locked</h4>
+    <ul>
+      <li>Tokens = the 33 <code>*_raw</code> scalars (explicit allowlist, never "all numeric").</li>
+      <li>Label = file-of-origin (signal vs VR), <b>not</b> <code>mcChannelNumber</code> (MC-only).</li>
+      <li>Fit one frozen tokenizer on VR (or combined), <code>transform</code> both → token <i>k</i> means
+        the same value on both sides. Pin the sklearn version (quantile edge default changes in 1.9).</li>
+      <li>Region-match on raw <code>htmiss_NOSYS</code> (VR is pre-skimmed &lt; 40; cut signal to match).</li>
+    </ul>
+
+    <h4>Open / next</h4>
+    <ul>
+      <li>Write the plan-A cutflow patch (<code>defineCutFlags()</code> + branch + <code>m_snapshotDf</code>),
+        compile on ng02.</li>
+      <li>Freeze <code>phase2_features.json</code> (the 33 raw + scaled twins) as the shared contract for
+        CSV-conversion and dashboard.</li>
+      <li>Build the 5-metric dashboard against the allowlist; bin-sweep; grammar-test code
+        (transition matrices + permutation null + bigram-vs-marginal lift + μ-stability).</li>
+      <li><code>diff -rq</code> working repo vs <code>/data2/kjohns</code> <code>Root/</code> (decides which
+        tree to patch); confirm <code>_all</code> vs plain MC suffix = HTmiss region distinction.</li>
+    </ul>
+
+    <div class="resume-wrap">
+      <p class="resume-label">Resume context</p>
+      <p class="resume-hint">Select all inside the box and paste into a new conversation to pick up exactly here.</p>
+<pre class="resume">HELIX / MSVtx Run-3 — Phase 2 (tokenization, exploratory) — resume context  [2026-06-10]
+
+PROJECT: ATLAS HSS LLP displaced-vertex search (MSVtx, Run 3) + HELIX "detector data as
+language". Tokenize the cutflow; learn Evt2Vec via InfoNCE; one partition function Z binds
+contrastive normalizer = Bayesian evidence = MaxEnt entropy floor. Phase-2 falsifiable
+question (the grammar test): "do signal and background induce DIFFERENT (class-conditional)
+grammars over the cutflow?" Proof = sequence/bigram classifier beats the order-blind MARGINAL
+baseline, CV-validated, survives region-matching, holds across 4 mass points.
+
+PHASE-2 PLAN (4 items):
+ (1) new cutflow: snapshot UPSTREAM of NN/selective cuts + per-cut flags  [design LOCKED, patch TODO]
+ (2) bin sweep: N_BINS {8,16,32,64} x strategy {quantile,uniform,log}
+ (3) run 4 mass points
+ (4) python dashboard + json db: 5 metrics = dAUC, MI-retained, vocab-knee, occupancy, edge-density
+
+SNAPSHOT DECISION (item 1) — LOCKED:
+ file = Root/CutflowRunnerOneVertex.cxx. ALL 279 feature cols are .Define'd BEFORE any Filter,
+ so snapshot column set is identical at every stage; only ROWS change. Branch AFTER "Passes
+ Trigger" (stage 1/14). Keep "1 MSVtx" as a Filter ON the branch (per-vertex .at(0) safety).
+ Convert downstream cuts (nMDT..NN2) to pass_* bool flags (no row drop). Redirect snapshot to
+ the branch via std::optional&lt;ROOT::RDF::RNode&gt; m_snapshotDf in base CutflowRunner.cxx;
+ LEAVE original filtered chain intact (Report/yields still reproduce Julian's reference).
+ Branch is BEFORE HTmiss so HTmiss stays un-applied (region-match in python on raw htmiss_NOSYS).
+ cut order: 0 cleaning, 1 trigger,[BRANCH], 2 HTMiss, 3 MET, 4 1MSVtx, 5 nMDT, 6 fiducial,
+ 7 RoImatch, 8 nTrig, 9 nSeg, 10 mindR, 11 vecPtSum, 12 NN1, 13 NN2.
+
+MATCHING — LOCKED (diagnose_snapshot_columns.py on real post-NN files):
+ bkg 474 cols, sig 476, 456 SHARED, no dtype mismatch. 33 raw features, ALL shared.
+ 50 scaled twins (AVOID), 276 vector branches incl InputMap* (AVOID).
+ TOKENS = the 33 *_raw scalars (allowlist; never "all numeric"):
+  MS1Vtx_clusE, MS1Vtx_avg_clusE, MS1Vtx_rms_clusE, MS1Vtx_maxclusE,
+  MS1Vtx_avg_clustime, MS1Vtx_rms_clustime, MS1Vtx_maxclustime,
+  MS1Vtx_l1ecal..l4ecal, MS1Vtx_l1hcal..l4hcal,
+  MS1Vtx_barrel_hits_ntot, MS1Vtx_endcap_hits_ntot, MS1Vtx_nTracklet,
+  MS1Vtx_mindR_jetcut, MS1Vtx_sumTrackPt0p2Cone,
+  nMSeg_ratio_BIBM, nMSeg_ratio_EIEM,
+  MSeg_{barrel,endcap}_{avg,rms}_dR, MSTracklet_{barrel,endcap}_{avg,rms}_dR,
+  MSVtx_MET_dphi, track_scalar_sum_pt_{barrel,endcap}        (all suffixed _raw)
+ RULES: label = file-of-origin (sig vs VR), NOT mcChannelNumber. Fit ONE frozen tokenizer on
+ VR (or combined), transform BOTH. Region-match on raw htmiss_NOSYS (VR pre-skimmed &lt;40).
+ PIN sklearn (quantile_method default changes in 1.9 -> moves edges).
+
+SAMPLES (campaign mismatch ACCEPTED as caveated exploratory):
+ signal MC = mc23a ONLY (no mc23e on atlng02 disk OR CERNBox). DSIDs 537836 mS5 ct411 /
+   537837 mS16 ct580 / 537838 mS35 ct1310 / 537839 mS55 ct1050.
+   disk: /data2/kjohns/run3_sample_ntuple_files/mc/HSS/user.juwack.&lt;dsid&gt;...mc23a...
+ background VR = data24VR ONLY (no data22/23 VR). 65 GB.
+   /data2/kjohns/run3_sample_ntuple_files/data/data24/data24VR/
+ mc23a=2022, data24=2024(=mc23e). 2-yr pileup gap (mu 54 vs 64).
+ MITIGATIONS: (a) pileup-reweight weighted MC to data24 mu-profile; (b) mu-stability control
+   in grammar test (split both into mu-bins; transition-matrix diff must persist within bins).
+ mc23e-HSS / data23VR production request: DECLINED for now.
+
+KEY PATHS (atlng02 / ng02; ng01 DOWN, no krb5 on ng02 -> EOS via browser/container):
+ cutflow repo (working): /home/naherlin/0_su_26/0_week_2/0_cutflow/ms-vtx-run-3-cutflow
+ cutflow repo (Julian ref): /data2/kjohns/ms-vtx-run-3-cutflow   (diff vs working: TBD)
+ diagnostic + report: /home/naherlin/0_su_26/0_week_2/0_tokenization_phase_2_exploratory/
+   diagnose_snapshot_columns.py , baseline_schema_report.json
+ baseline post-NN snapshots (week_9):
+   sig mS35: .../0_sp_26/0_week_9/cutflow_run/run/mc_mS35_20260403-174814/events.root
+   bkg VR  : .../0_sp_26/0_week_9/cutflow_run/run/data24VR_20260327-222227/events.root
+   (snapshot ROOT = events.root, tree 'analysis'; histograms.root has NO analysis tree)
+ cutflow env: setupATLAS && asetup AnalysisBase,25.2.81 && source build/x86_64-el9-gcc14-opt/setup.sh
+ runCutflow.py: --configFile config/cutflow1VtxRoI.yaml -i &lt;path&gt; -m metadata/hssMetaData.txt
+   -c config/histograms1VtxRoI.txt -t analysis -o &lt;name&gt; -l &lt;label&gt; [--channel 1VtxRoIVR for VR]
+
+NEXT ACTIONS:
+ - write plan-A cutflow patch (defineCutFlags + branch + m_snapshotDf) -> compile on ng02
+ - freeze phase2_features.json (33 raw + scaled twins) = shared contract
+ - build 5-metric dashboard reading that allowlist (frozen tokenizer + region-match baked in)
+ - build bin-sweep + grammar-test code against synthetic/stand-in now (button-press when file lands)
+ - diff -rq working vs kjohns Root/ ; confirm _all vs plain MC = HTmiss region
+
+ALREADY SHIPPED to HELIX docs this phase: info-theory panel; tokenization flow/metrics/journey
+panels (provenance table, 5-metric defs, healthy/unhealthy edge-density figures); references.json
+(+Finke 2023, OmniJet-a, MPM, Leigh, Huang/TrackingBERT [H]; Dougherty, Fayyad-Irani [L]);
+glossary (delta-auc, edge-density). KaTeX vendored. Docs render on FORGE light surface.</pre>
+    </div>
+
+  </div>
+  </details>
+</article>
+
+</div>

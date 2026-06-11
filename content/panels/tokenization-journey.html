@@ -29,6 +29,20 @@
   .tkj .caveat b{color:#5e4d0e;}
   .tkj .caveat ul{margin:8px 0 0;padding-left:18px;} .tkj .caveat li{margin:5px 0;}
   .tkj .holder{font-style:italic;color:var(--doc-ink-faint);}
+.tkj table.prov{width:100%;border-collapse:collapse;margin:14px 0 6px;font-size:14px;}
+.tkj table.prov th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--acc-orange);border-bottom:2px solid var(--doc-line);padding:0 12px 8px;}
+.tkj table.prov td{vertical-align:top;padding:10px 12px;border-bottom:1px solid var(--doc-line-soft);color:var(--doc-ink-soft);line-height:1.5;}
+.tkj table.prov td:first-child{color:var(--doc-ink);}
+.tkj table.prov tr:hover td{background:var(--doc-bg-muted);}
+.tkj .tag-prec,.tkj .tag-novel{font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.06em;text-transform:uppercase;padding:2px 8px;border-radius:20px;border:1px solid;white-space:nowrap;}
+.tkj .tag-prec{color:#0e6f86;border-color:#9fd3df;background:#e7f6fa;}
+.tkj .tag-novel{color:#9a5a12;border-color:#e6c79a;background:#fcf2e3;}
+.tkj .prov-note{display:inline-block;font-style:italic;color:var(--doc-ink-faint);font-size:12px;}
+.tkj table.mx5{width:100%;border-collapse:collapse;margin:12px 0 6px;font-size:12.5px;}
+.tkj table.mx5 th{text-align:left;font-family:'Share Tech Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc-orange);border-bottom:2px solid var(--doc-line);padding:0 9px 7px;}
+.tkj table.mx5 td{vertical-align:top;padding:9px;border-bottom:1px solid var(--doc-line-soft);color:var(--doc-ink-soft);line-height:1.45;}
+.tkj table.mx5 td:first-child{color:var(--doc-ink);font-weight:500;}
+.tkj table.mx5 tr:hover td{background:var(--doc-bg-muted);}
 </style>
 
 <div class="kicker"><span class="bar"></span>05 · Tokenization &mdash; Journey</div>
@@ -37,6 +51,22 @@
 <p class="lead">A living record of proving the &ldquo;numbers as tokens&rdquo; premise, phase by phase.
   The Flow and Metrics panels are timeless; <b>this one updates</b>. Each phase's numbers are stamped with
   the sample they came from, because readings change between rounds even when the framework does not.</p>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">Provenance &mdash; borrowed bridge, novel object</h3>
+<p class="doc-p">The numbers-as-tokens move is <b>not</b> ours to claim &mdash; it is established HEP practice. What is novel is the <i>object</i> we run it over (the ordered cutflow) and the partition-function binding. This table separates the two so the contribution stays honest.</p>
+<table class="prov">
+  <tr><th>Step in the pipeline</th><th>What HELIX assumes</th><th>Status</th><th>Sources</th></tr>
+  <tr><td>Discretize features into bins</td><td>Quantizing a continuous feature into intervals retains its label information.</td><td><span class="tag-prec">Precedent</span></td><td><cite data-ref="dougherty1995"></cite> <cite data-ref="fayyad1993"></cite></td></tr>
+  <tr><td><dfn data-term="binning">Bins</dfn> as a vocabulary</td><td>An event reads as a sentence, its numeric features as tokens (&ldquo;numbers as words&rdquo;).</td><td><span class="tag-prec">Precedent</span></td><td><cite data-ref="finke2023"></cite></td></tr>
+  <tr><td>Fixed binning vs learned tokenizer</td><td>A frozen <dfn data-term="quantile-binning">quantile</dfn> grid is an acceptable tokenizer; its loss against a VQ-VAE is bounded and measurable.</td><td><span class="tag-prec">Precedent</span></td><td><cite data-ref="omnijet2024"></cite></td></tr>
+  <tr><td>Order-preserving bin embedding</td><td><dfn data-term="numeric-embedding">Numeric-aware</dfn> embeddings beat nominal IDs by keeping bin order.</td><td><span class="tag-prec">Precedent</span></td><td><cite data-ref="gorishniy2022"></cite></td></tr>
+  <tr><td>Tokens as an ordered sequence</td><td>The <dfn data-term="cutflow">cutflow</dfn> is a causally-ordered sequence with grammar &mdash; not an unordered set.</td><td><span class="tag-novel">Novel</span></td><td><cite data-ref="janner2021"></cite> <cite data-ref="huang2024"></cite> <span class="prov-note">(seq. precedent; cutflow object is ours)</span></td></tr>
+  <tr><td>Self-supervised contrastive pretraining</td><td><dfn data-term="infonce">InfoNCE</dfn> on physics tokens yields transferable embeddings without signal MC.</td><td><span class="tag-prec">Precedent</span></td><td><cite data-ref="jetclr2022"></cite> <cite data-ref="mpm2024"></cite> <span class="prov-note">(cf. <cite data-ref="leigh2024"></cite>)</span></td></tr>
+  <tr><td>One <dfn data-term="partition-function">Z</dfn>: normalizer = evidence = floor</td><td>A single partition function spans the embedding, the background handle, and the epistemic floor.</td><td><span class="tag-novel">Novel</span></td><td><cite data-ref="kuntz2024"></cite> <cite data-ref="jaynes1957"></cite> <span class="prov-note">(foundations; binding is ours)</span></td></tr>
+  <tr><td>Cutflow carries learnable grammar</td><td>Signal vs background cut-transition matrices differ (<dfn data-term="bigram">bigram</dfn> non-trivial).</td><td><span class="tag-novel">Novel</span></td><td><span class="prov-note">HELIX Week-0 gate</span></td></tr>
+</table>
 
 <div class="rule"></div>
 
@@ -105,6 +135,20 @@
   on ATLAS data &mdash; the <dfn data-term="data-processing-inequality">DPI</dfn> step is lossless. <b>What it
   does not:</b> clean feature-only separation, mass-point generality, cut grammar, or any
   <dfn data-term="channel-capacity">capacity</dfn>/floor number. Those wait on Phase 2.</p>
+
+<div class="rule"></div>
+
+<h3 class="doc-h3">Phase 2 metric suite &mdash; the five instruments</h3>
+<p class="doc-p">Phase 1 ran four panels on a labeled post-NN sample. Phase 2&rsquo;s region-matched, four-mass-point rebuild reads the full <b>five-panel</b> suite. The fifth panel closes the one failure mode the first four cannot see: a feature can show flat <dfn data-term="bin-occupancy">occupancy</dfn> and full entropy $H(p_k)$ yet still bleed <dfn data-term="mutual-information">MI</dfn> because quantile binning crushed its discriminating tail into one wide token.</p>
+<table class="mx5">
+  <tr><th>Panel</th><th>Measures</th><th>Healthy</th><th>Failure</th><th>Take-home</th></tr>
+  <tr><td><dfn data-term="delta-auc">&Delta;AUC</dfn> (binned&minus;raw)</td><td>per-feature separation lost to tokenizing (rank AUC)</td><td>bars near 0, all &le; 0</td><td>long negative bars; outliers detaching</td><td>ranks which features binning damages; a positive bar is an artifact/leak, not a win (<dfn data-term="data-processing-inequality">DPI</dfn>)</td></tr>
+  <tr><td><dfn data-term="mi-retention">MI</dfn> retained</td><td>$I(\text{token};\text{label})$ binned vs raw, in nats</td><td>points on the diagonal</td><td>points below &mdash; worst at the high-MI right side</td><td>losing the most info from your <i>most</i> informative features is the real danger</td></tr>
+  <tr><td>Vocab-size knee</td><td>mean retention vs <dfn data-term="vocabulary-size">N_BINS</dfn></td><td>steep rise, clear knee, plateau &rarr; 1</td><td>still climbing at 64; or a late knee</td><td>pick the smallest N_BINS past the knee; it&rsquo;s a mean &mdash; read with the MI panel</td></tr>
+  <tr><td>Bin <dfn data-term="bin-occupancy">occupancy</dfn></td><td>events per bin index; implies $H(p_k)$</td><td>flat &asymp; 1/N_BINS, all bins live</td><td>mass in 1&ndash;2 bins with dead cells</td><td>catches collapse, label-free; blind to a giant tail bin</td></tr>
+  <tr><td><dfn data-term="edge-density">Edge-density</dfn> / max-bin-width</td><td>widest token&rsquo;s span as a fraction of range + signal-region edge count</td><td>no bin dominates; edges present where signal lives</td><td>one bin spans the tail; sparse edges in the signal region</td><td>catches tail under-resolution that occupancy and entropy are blind to</td></tr>
+</table>
+<p class="doc-p" style="font-size:14px;">The first four cover <b>capacity</b> (occupancy / $H$), <b>coupling</b> (MI), and <b>decision</b> (&Delta;AUC) &mdash; the floor&rarr;leak&rarr;boundary chain. The fifth &mdash; a per-feature max-bin-width / signal-region edge-count diagnostic &mdash; closes the gap they share.</p>
 
 <div class="rule"></div>
 

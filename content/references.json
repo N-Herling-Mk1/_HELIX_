@@ -1,6 +1,6 @@
 {
   "_comment": "HELIX bibliography. Inline <cite data-ref=\"KEY\"></cite> tags in any panel auto-number by this array's order and link to the References panel. APPEND-ONLY: add new entries at the end so existing citation numbers never shift. Each entry: id (the data-ref key), authors, year, title, venue, links[]. Each entry also carries a 'sector' — one of H/E/L/I/X (HEP, Epistemic, Learning, Information theory, eXploration) — mapping the citation to the HELIX pillar it supports.",
-  "last_updated": "2026-06-08",
+  "last_updated": "2026-06-10",
   "refs": [
     {
       "id": "jaynes1957",
@@ -231,6 +231,103 @@
           "url": "https://arxiv.org/abs/2106.02039"
         }
       ]
+    },
+    {
+      "id": "finke2023",
+      "sector": "H",
+      "authors": "T. Finke, M. Krämer, A. Mück, J. Tönshoff",
+      "year": 2023,
+      "title": "Learning the language of QCD jets with transformers",
+      "venue": "JHEP 06 (2023) 184",
+      "links": [
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2303.07364"
+        },
+        {
+          "label": "DOI",
+          "url": "https://doi.org/10.1007/JHEP06(2023)184"
+        }
+      ]
+    },
+    {
+      "id": "omnijet2024",
+      "sector": "H",
+      "authors": "J. Birk, A. Hallin, G. Kasieczka",
+      "year": 2024,
+      "title": "OmniJet-α: The first cross-task foundation model for particle physics",
+      "venue": "Mach. Learn.: Sci. Technol. 5, 035031",
+      "links": [
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2403.05618"
+        }
+      ]
+    },
+    {
+      "id": "mpm2024",
+      "sector": "H",
+      "authors": "T. Golling, L. Heinrich, M. Kagan, et al.",
+      "year": 2024,
+      "title": "Masked particle modeling on sets: towards self-supervised high energy physics foundation models",
+      "venue": "Mach. Learn.: Sci. Technol. 5, 035074",
+      "links": [
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2401.13537"
+        }
+      ]
+    },
+    {
+      "id": "leigh2024",
+      "sector": "H",
+      "authors": "M. Leigh, S. Klein, F. Charton, et al.",
+      "year": 2024,
+      "title": "Is Tokenization Needed for Masked Particle Modelling?",
+      "venue": "NeurIPS 2024 FM4Science wksp; Mach. Learn.: Sci. Technol. (2025)",
+      "links": [
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2409.12589"
+        }
+      ]
+    },
+    {
+      "id": "huang2024",
+      "sector": "H",
+      "authors": "A. Huang, Y. Melkani, P. Calafiura, et al.",
+      "year": 2024,
+      "title": "A Language Model for Particle Tracking (TrackingBERT)",
+      "venue": "Connecting the Dots 2023 (2024)",
+      "links": [
+        {
+          "label": "arXiv",
+          "url": "https://arxiv.org/abs/2402.10239"
+        }
+      ]
+    },
+    {
+      "id": "dougherty1995",
+      "sector": "L",
+      "authors": "J. Dougherty, R. Kohavi, M. Sahami",
+      "year": 1995,
+      "title": "Supervised and Unsupervised Discretization of Continuous Features",
+      "venue": "Proc. 12th Int. Conf. on Machine Learning (ICML), 194–202",
+      "links": [
+        {
+          "label": "S2",
+          "url": "https://www.semanticscholar.org/paper/be3cdcd1e0e668d209c7ac30cbf083854e80046e"
+        }
+      ]
+    },
+    {
+      "id": "fayyad1993",
+      "sector": "L",
+      "authors": "U. M. Fayyad, K. B. Irani",
+      "year": 1993,
+      "title": "Multi-Interval Discretization of Continuous-Valued Attributes for Classification Learning",
+      "venue": "Proc. 13th Int. Joint Conf. on Artificial Intelligence (IJCAI), 1022–1027",
+      "links": []
     }
   ]
 }

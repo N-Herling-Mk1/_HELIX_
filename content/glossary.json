@@ -373,6 +373,20 @@
       "cat": "NLP",
       "gloss": "Text tokenization that builds a vocabulary by merging frequent character pairs.",
       "def": "Byte-Pair Encoding and related schemes (WordPiece, Unigram) segment text into sub-word units whose vocabulary is learned from corpus frequency — frequent words become single tokens, rare ones fragment. The contrast with HELIX's quantization route: text tokens are nominal symbols discovered from frequency; feature tokens are ordinal symbols manufactured by binning."
+    },
+    {
+      "id": "delta-auc",
+      "term": "ΔAUC (binned − raw)",
+      "cat": "Tokenization",
+      "gloss": "Per-feature single-variable separation lost when a value is replaced by its bin index.",
+      "def": "ΔAUC = AUC(binned) − AUC(raw), a per-feature rank-AUC difference. By the data-processing inequality it can only be ≤ 0; a positive value signals an estimator artifact or label leakage, not a gain from binning. Ranks which features tokenizing damages most."
+    },
+    {
+      "id": "edge-density",
+      "term": "Edge-density / max-bin-width",
+      "cat": "Tokenization",
+      "gloss": "Diagnostic for tail under-resolution: how much of a feature's range one token spans.",
+      "def": "A per-feature geometric diagnostic on the frozen bin edges: the widest token's span as a fraction of the feature range, plus the count of edges falling in the signal region (the tail). It catches tail under-resolution — a feature can show flat occupancy and full entropy H(p_k) yet still lose mutual information because quantile binning crushed its discriminating tail into one wide token. The fifth Phase-2 metric panel; the failure mode occupancy and entropy are blind to."
     }
   ]
 }
